@@ -1,0 +1,4 @@
+if (NOT TARGET SDL_IMAGE)
+  set(VENDOR_SDL_IMAGE_DIR "${CMAKE_SOURCE_DIR}/vendor/SDL_image")
+  add_subdirectory(${VENDOR_SDL_IMAGE_DIR} EXCLUDE_FROM_ALL)
+endif()
