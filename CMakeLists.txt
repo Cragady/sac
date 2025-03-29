@@ -30,6 +30,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # TODO: see if this is only necessary for Windows
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
+file(COPY "${CMAKE_SOURCE_DIR}/assets" DESTINATION "${BUILD_OUTPUT}")
 
 include(clayImport)
 include(SDLImport)
