@@ -1,1 +1,1 @@
-#include "SAC/examples/sdl3-simple-demo.c"
+#include "SAC/sac.c"

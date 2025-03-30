@@ -1,11 +1,14 @@
+# TODO: bring in win-mouse.c, lin-mouse.c, or mac-mouse.c automatically or based
+# on the target
 set (SAC_SOURCES
-#   ${SAC_SOURCES_DIR}/sac.c
-  ${SAC_SOURCES_DIR}/examples/sdl3-simple-demo.c
-  ${SAC_SOURCES_DIR}/examples/sdl3-ttf-example.c
+  ${SAC_SOURCES_DIR}/sac.c
+  ${SAC_SOURCES_DIR}/mouse/win-mouse.c
+  ${SAC_SOURCES_DIR}/time/time.c
 )
 
 set (SAC_HEADERS
 #   ${SAC_SOURCES_DIR}/sac.h
+  ${SAC_SOURCES_DIR}/time/time.h
 )
 
 set(SAC_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
