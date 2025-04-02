@@ -4,6 +4,7 @@
 #define CLAY_IMPLEMENTATION
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL.h>
+// NOTE: Only include the next line once in entire app
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
@@ -11,6 +12,7 @@
 
 #include <mouse_commands.h>
 #include <key_commands.h>
+#include <x_key_commands.h>
 
 #include <stdio.h>
 
@@ -27,6 +29,8 @@ static const Clay_Color COLOR_ORANGE = (Clay_Color){225, 138, 50, 255};
 static const Clay_Color COLOR_BLUE = (Clay_Color){111, 173, 162, 255};
 static const Clay_Color COLOR_LIGHT = (Clay_Color){224, 215, 210, 255};
 
+static const double CPS_TIMER_TARGET = 1.0 / 100;
+static const double INPUT_TIMER_TARGET = 0.250;
 SDL_Surface *sample_image;
 
 static inline Clay_Dimensions SDL_MeasureText(Clay_StringSlice text,
@@ -64,6 +68,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   // NOTE: we need extra init since calloc doesn't fit our needs in d_time
   init_delta_time_s(&state->d_time);
+  state->cps_timer_target = CPS_TIMER_TARGET;
+  state->input_timer_target = INPUT_TIMER_TARGET;
 
   if (!SDL_CreateWindowAndRenderer("Clay Demo", 640, 480, 0, &state->window,
                                    &state->rendererData.renderer)) {
@@ -172,18 +178,23 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   calc_delta_time(&state->d_time);
   get_mouse_pos(&state->mouse_info);
   state->stop_timer += state->d_time.delta_time;
-  // printf("Mouse pos | x: %i, y: %i\n", state->mouse_info.x,
-  //        state->mouse_info.y);
+  state->cps_timer += state->d_time.delta_time;
+  state->input_timer -= state->d_time.delta_time;
+  bool cps_timer_hit = state->cps_timer >= (double)state->cps_timer_target;
 
-  // Mouse pos | x: 1001, y: 595
-  // int wanted_x = 1001;
-  // int wanted_y = 595;
-  // if (state->mouse_info.x != wanted_x || state->mouse_info.y != wanted_y) {
-  //   move_mouse(wanted_x, wanted_y);
-  // } else {
-  //   l_click_mouse(wanted_x, wanted_y);
-  //   times_clicked++;
-  // }
+  if (state->input_timer <= 0.0) {
+    bool state_changed = global_click_spam_toggle(state);
+    if (state_changed) {
+      state->input_timer = state->input_timer_target;
+    }
+  }
+
+  if (state->should_click && cps_timer_hit) {
+    l_click_mouse(state->mouse_info.x, state->mouse_info.y);
+    state->total_times_clicked++;
+    state->cps_timer = 0;
+    printf("Is clicking now!! At x: %i, y: %i\n", state->mouse_info.x, state->mouse_info.y);
+  }
   // if (timer_countdown >= (double)STOP_TIMER) {
   //   state->sdl_result = SDL_APP_SUCCESS;
   // }

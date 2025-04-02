@@ -1,6 +1,6 @@
-#include "SDL3/SDL_init.h"
 #include <key_commands.h>
 #include <windows.h>
+#include <x_key_commands.h>
 
 bool get_keyboard_state(sac_key_state_s *key_state_s) {
   PBYTE key_array = (BYTE *)key_state_s->key_state;
@@ -17,27 +17,6 @@ bool is_global_key_pressed(int key) {
   get_async_key_state(key, &pressed);
 
   return pressed & BIT_FLAG_KEY_PRESSED_WIN_KEY_STATE;
-}
-
-bool is_global_prog_escape_req() {
-  // TODO: change capslock undo if sequence key is customizable
-  bool ctl_sequence = is_global_key_pressed(VK_CAPITAL);
-  bool esc_ctl = is_global_key_pressed(ESCAPE_PROG_KEY);
-  bool esc_sequence_set = esc_ctl && ctl_sequence;
-
-  // NOTE: undo capslock press
-  if (esc_sequence_set) {
-    // TODO: undo hard-coded arg
-    undo_capslock_press(true);
-  }
-
-  return esc_sequence_set;
-}
-
-SDL_AppResult check_app_should_close(SDL_AppResult app_result) {
-  if (is_global_prog_escape_req())
-    return SDL_APP_SUCCESS;
-  return app_result;
 }
 
 void undo_capslock_press(bool command_has_capslock) {
@@ -63,4 +42,28 @@ void undo_capslock_press(bool command_has_capslock) {
   input[0].ki.dwFlags = KEYEVENTF_KEYUP;
 
   SendInput(2, input, sizeof(INPUT));
+}
+
+int convert_common_key_name_for_api(KEY_NAMES_E_ key_name) {
+  // NOTE: don't implement default so that the LSP / Compiler will scream
+  // at you to finish the switch statement if one or more is missing.
+  switch (key_name) {
+  case KEY_NAMES_E_NONE:
+    return 0;
+  case KEY_NAMES_E_CAPITAL:
+    return VK_CAPITAL;
+  case KEY_NAMES_E_ESC:
+    return VK_ESCAPE;
+  case KEY_NAMES_E_1:
+    return '1';
+  case KEY_NAMES_E_2:
+    return '2';
+  case KEY_NAMES_E_3:
+    return '3';
+  case KEY_NAMES_E_4:
+    return '4';
+  case KEY_NAMES_E_5:
+    return '5';
+  }
+  return 0;
 }

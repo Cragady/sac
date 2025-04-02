@@ -7,16 +7,17 @@ set (SAC_SOURCES
   # TODO: refactor out need to use 'include' directive on next two source files
   # ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.c
   # ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.c
+  ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
+  ${SAC_SOURCES_DIR}/keyboard/key_commands.c
   ${SAC_SOURCES_DIR}/mouse/win_mouse.c
   ${SAC_SOURCES_DIR}/time/time.c
-  ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
 )
 
 set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/sac.h
-  ${SAC_SOURCES_DIR}/time/time.h
   ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.h
   ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.h
+  ${SAC_SOURCES_DIR}/time/time.h
 )
 
 set(SAC_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")

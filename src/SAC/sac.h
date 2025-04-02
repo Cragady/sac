@@ -2,7 +2,6 @@
 #define SAC_SAC_H
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <clay.h>
@@ -25,7 +24,11 @@ typedef struct app_state {
   int total_times_clicked;
   float stop_timer_target;
   double stop_timer;
+  double cps_timer_target;
   double cps_timer;
+  double input_timer_target;
+  double input_timer;
+  bool should_click;
 } AppState;
 
 #endif
