@@ -1,16 +1,23 @@
+#ifndef SAC_SAC_C_ENTRY_POINT
+#define SAC_SAC_C_ENTRY_POINT
+
+#define CLAY_IMPLEMENTATION
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#define CLAY_IMPLEMENTATION
 #include <clay.h>
+
 #include <mouse_commands.h>
-#include "key_commands.h"
+#include <key_commands.h>
 
 #include <stdio.h>
 
+#include "SAC/sac.h"
+#include "SAC/examples/shared-layouts/clay-video-demo.h"
 #include "SAC/examples/shared-layouts/clay-video-demo.c"
+#include "SAC/renderers/clay_renderer_SDL3.h"
 #include "SAC/renderers/clay_renderer_SDL3.c"
 #include "SAC/time/time.h"
 
@@ -20,21 +27,7 @@ static const Clay_Color COLOR_ORANGE = (Clay_Color){225, 138, 50, 255};
 static const Clay_Color COLOR_BLUE = (Clay_Color){111, 173, 162, 255};
 static const Clay_Color COLOR_LIGHT = (Clay_Color){224, 215, 210, 255};
 
-typedef struct app_state {
-  SDL_Window *window;
-  Clay_SDL3RendererData rendererData;
-  ClayVideoDemo_Data demoData;
-  SDL_AppResult sdl_result;
-  delta_time_s d_time;
-  mouse_info_s mouse_info;
-  sac_key_state_s key_state_s;
-} AppState;
-
 SDL_Surface *sample_image;
-
-static const int STOP_TIMER = 7;
-double timer_countdown = 0;
-int times_clicked = 0;
 
 static inline Clay_Dimensions SDL_MeasureText(Clay_StringSlice text,
                                               Clay_TextElementConfig *config,
@@ -69,6 +62,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   }
   *appstate = state;
 
+  // NOTE: we need extra init since calloc doesn't fit our needs in d_time
   init_delta_time_s(&state->d_time);
 
   if (!SDL_CreateWindowAndRenderer("Clay Demo", 640, 480, 0, &state->window,
@@ -177,7 +171,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   calc_delta_time(&state->d_time);
   get_mouse_pos(&state->mouse_info);
-  timer_countdown += state->d_time.delta_time;
+  state->stop_timer += state->d_time.delta_time;
   // printf("Mouse pos | x: %i, y: %i\n", state->mouse_info.x,
   //        state->mouse_info.y);
 
@@ -223,8 +217,6 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
 
   AppState *state = appstate;
 
-  printf("I clicked %i times!\n", times_clicked);
-
   if (state) {
     if (state->rendererData.renderer)
       SDL_DestroyRenderer(state->rendererData.renderer);
@@ -249,3 +241,5 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   }
   TTF_Quit();
 }
+
+#endif

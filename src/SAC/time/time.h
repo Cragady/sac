@@ -1,3 +1,6 @@
+#ifndef SAC_TIME_TIME_H
+#define SAC_TIME_TIME_H
+
 #include "SDL3/SDL_stdinc.h"
 
 /**
@@ -13,3 +16,5 @@ typedef struct delta_time_t {
 
 int init_delta_time_s(delta_time_s*);
 int calc_delta_time(delta_time_s*);
+
+#endif

@@ -2,14 +2,21 @@
 # on the target
 set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/sac.c
+  # NOTE: for now, we exclude these items due to using the 'include' directive
+  # used directly on the source files. Need to refactor this out.
+  # TODO: refactor out need to use 'include' directive on next two source files
+  # ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.c
+  # ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.c
   ${SAC_SOURCES_DIR}/mouse/win_mouse.c
   ${SAC_SOURCES_DIR}/time/time.c
   ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
 )
 
 set (SAC_HEADERS
-#   ${SAC_SOURCES_DIR}/sac.h
+  ${SAC_SOURCES_DIR}/sac.h
   ${SAC_SOURCES_DIR}/time/time.h
+  ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.h
+  ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.h
 )
 
 set(SAC_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
