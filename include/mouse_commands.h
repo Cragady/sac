@@ -1,3 +1,6 @@
+#ifndef INCLUDE_MOUSE_COMMANDS_H
+#define INCLUDE_MOUSE_COMMANDS_H
+
 #include <stdbool.h>
 
 typedef struct mouse_info_t {
@@ -10,3 +13,4 @@ bool get_mouse_pos(mouse_info_s *);
 void l_click_mouse(int x, int y);
 void r_click_mouse(int x, int y);
 
+#endif

@@ -2,8 +2,9 @@
 # on the target
 set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/sac.c
-  ${SAC_SOURCES_DIR}/mouse/win-mouse.c
+  ${SAC_SOURCES_DIR}/mouse/win_mouse.c
   ${SAC_SOURCES_DIR}/time/time.c
+  ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
 )
 
 set (SAC_HEADERS

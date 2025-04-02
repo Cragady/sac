@@ -6,6 +6,7 @@
 #define CLAY_IMPLEMENTATION
 #include <clay.h>
 #include <mouse_commands.h>
+#include "key_commands.h"
 
 #include <stdio.h>
 
@@ -26,6 +27,7 @@ typedef struct app_state {
   SDL_AppResult sdl_result;
   delta_time_s d_time;
   mouse_info_s mouse_info;
+  sac_key_state_s key_state_s;
 } AppState;
 
 SDL_Surface *sample_image;
@@ -208,6 +210,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
    *
    */
 
+  state->sdl_result = check_app_should_close(state->sdl_result);
   return state->sdl_result;
 }
 
