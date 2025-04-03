@@ -3,8 +3,17 @@
 
 #include "SAC/examples/shared-layouts/clay-video-demo.h"
 
+// NOTE: start globals
 const int FONT_ID_BODY_16 = 0;
 Clay_Color COLOR_WHITE = { 255, 255, 255, 255};
+
+Document documentsRaw[5];
+
+DocumentArray documents = {
+    .length = 5,
+    .documents = documentsRaw
+};
+// NOTE: end globals
 
 void RenderHeaderButton(Clay_String text) {
     CLAY({
@@ -29,14 +38,6 @@ void RenderDropdownMenuItem(Clay_String text) {
         }));
     }
 }
-
-Document documentsRaw[5];
-
-DocumentArray documents = {
-    .length = 5,
-    .documents = documentsRaw
-};
-
 
 void HandleSidebarInteraction(
     Clay_ElementId elementId,

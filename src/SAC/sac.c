@@ -23,6 +23,7 @@
 #include "SAC/renderers/clay_renderer_SDL3.c"
 #include "SAC/time/time.h"
 
+// NOTE: start globals
 static const Uint32 FONT_ID = 0;
 
 static const Clay_Color COLOR_ORANGE = (Clay_Color){225, 138, 50, 255};
@@ -32,6 +33,8 @@ static const Clay_Color COLOR_LIGHT = (Clay_Color){224, 215, 210, 255};
 static const double CPS_TIMER_TARGET = 1.0 / 100;
 static const double INPUT_TIMER_TARGET = 0.250;
 SDL_Surface *sample_image;
+// NOTE: end globals
+
 
 static inline Clay_Dimensions SDL_MeasureText(Clay_StringSlice text,
                                               Clay_TextElementConfig *config,
