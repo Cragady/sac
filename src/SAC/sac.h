@@ -29,6 +29,7 @@ typedef struct app_state {
   double input_timer_target;
   double input_timer;
   bool should_click;
+  int click_batch_added_per_cycle;
 } AppState;
 
 #endif

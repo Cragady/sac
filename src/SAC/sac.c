@@ -19,6 +19,8 @@
 #include "SAC/sac.h"
 #include "SAC/examples/shared-layouts/clay-video-demo.h"
 #include "SAC/examples/shared-layouts/clay-video-demo.c"
+#include "SAC/input/input.h"
+#include "SAC/output/output.h"
 #include "SAC/renderers/clay_renderer_SDL3.h"
 #include "SAC/renderers/clay_renderer_SDL3.c"
 #include "SAC/time/time.h"
@@ -30,8 +32,9 @@ static const Clay_Color COLOR_ORANGE = (Clay_Color){225, 138, 50, 255};
 static const Clay_Color COLOR_BLUE = (Clay_Color){111, 173, 162, 255};
 static const Clay_Color COLOR_LIGHT = (Clay_Color){224, 215, 210, 255};
 
-static const double CPS_TIMER_TARGET = 1.0 / 100;
+static const double CPS_TIMER_TARGET = 1.0 / 500;
 static const double INPUT_TIMER_TARGET = 0.250;
+static const int CLICK_BATCH_ADDED_PER_CYCLE = 5;
 SDL_Surface *sample_image;
 // NOTE: end globals
 
@@ -73,6 +76,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   init_delta_time_s(&state->d_time);
   state->cps_timer_target = CPS_TIMER_TARGET;
   state->input_timer_target = INPUT_TIMER_TARGET;
+  state->click_batch_added_per_cycle = CLICK_BATCH_ADDED_PER_CYCLE;
 
   if (!SDL_CreateWindowAndRenderer("Clay Demo", 640, 480, 0, &state->window,
                                    &state->rendererData.renderer)) {
@@ -162,6 +166,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   AppState *state = appstate;
   state->sdl_result = SDL_APP_CONTINUE;
 
+
+  calc_delta_time(&state->d_time);
+  handle_timers(state);
+  handle_global_input(state);
+
+  handle_output_clicking(state);
+
   Clay_RenderCommandArray render_commands =
       ClayVideoDemo_CreateLayout(&state->demoData);
 
@@ -172,53 +183,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   SDL_RenderPresent(state->rendererData.renderer);
 
-  /**
-   * NOTE: Start experimental item
-   *
-   *
-   */
-
-  calc_delta_time(&state->d_time);
-  get_mouse_pos(&state->mouse_info);
-  state->stop_timer += state->d_time.delta_time;
-  state->cps_timer += state->d_time.delta_time;
-  state->input_timer -= state->d_time.delta_time;
-  bool cps_timer_hit = state->cps_timer >= (double)state->cps_timer_target;
-
-  if (state->input_timer <= 0.0) {
-    bool state_changed = global_click_spam_toggle(state);
-    if (state_changed) {
-      state->input_timer = state->input_timer_target;
-    }
-  }
-
-  if (state->should_click && cps_timer_hit) {
-    l_click_mouse(state->mouse_info.x, state->mouse_info.y);
-    state->total_times_clicked++;
-    state->cps_timer = 0;
-    printf("Is clicking now!! At x: %i, y: %i\n", state->mouse_info.x, state->mouse_info.y);
-  }
-  // if (timer_countdown >= (double)STOP_TIMER) {
-  //   state->sdl_result = SDL_APP_SUCCESS;
-  // }
-
-  // printf("Starting app, testing mouse moves and clicks: \n");
-
-  // int wanted_x = 150;
-  // int wanted_y = 150;
-  // move_mouse(wanted_x, wanted_y);
-  // r_click_mouse(wanted_x, wanted_y);
-  // move_mouse(wanted_x * 2, wanted_y * 2);
-
-  // printf("End experimental, moving to next part of app\n");
-
-  /**
-   * NOTE: End experimental item
-   *
-   *
-   */
-
-  state->sdl_result = check_app_should_close(state->sdl_result);
   return state->sdl_result;
 }
 

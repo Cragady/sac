@@ -7,15 +7,19 @@ set (SAC_SOURCES
   # TODO: refactor out need to use 'include' directive on next two source files
   # ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.c
   # ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.c
+  ${SAC_SOURCES_DIR}/input/input.c
   ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
   ${SAC_SOURCES_DIR}/keyboard/key_commands.c
   ${SAC_SOURCES_DIR}/mouse/win_mouse.c
+  ${SAC_SOURCES_DIR}/output/output.c
   ${SAC_SOURCES_DIR}/time/time.c
 )
 
 set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/sac.h
   ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.h
+  ${SAC_SOURCES_DIR}/input/input.h
+  ${SAC_SOURCES_DIR}/output/output.c
   ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.h
   ${SAC_SOURCES_DIR}/time/time.h
 )
@@ -45,3 +49,4 @@ target_link_libraries(SAC PUBLIC SAClib)
 target_include_directories(SAC PUBLIC ${SAC_INCLUDE_DIRS})
 set_target_properties(SAC PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT})
 
+add_subdirectory(odometer ${BUILD_OUTPUT}/odometer)
