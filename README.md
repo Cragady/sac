@@ -1,6 +1,6 @@
 # SAC (Simple Auto Clicker)
 
-This repo is meant to be a simple auto-clicker created in `c` using the `clay` lib. I'm developing this for `Windows` first, then eventually maybe for `Linux` targeting `X11`, and maybe `Wayland` if I'm feeling ambitious enough. The reason I need to target these items is so that I can initiate clicks as if it's coming from the OS. On Windows, I can do this with `windows.h`. I haven't delved too deeply in OS specific GUI development, so I don't know what that would look like on Linux - Maybe it's something different, or maybe it's as I mentioned before: `X11` and/or `Wayland` to help me initiate clicks without the program having focus.
+This repo is meant to be a simple auto-clicker created in `C` using the `clay` lib. I'm developing this for `Windows` first, then eventually maybe for `Linux` targeting `X11`, and maybe `Wayland` if I'm feeling ambitious enough. The reason I need to target these items is so that I can initiate clicks as if it's coming from the OS. On Windows, I can do this with `windows.h`. I haven't delved too deeply in OS specific GUI development, so I don't know what that would look like on Linux - Maybe it's something different, or maybe it's as I mentioned before: `X11` and/or `Wayland` to help me initiate clicks without the program having focus.
 
 There are some auto-clickers that claim to be as fast as 50k/second, and that quite frankly, is amazing if true. I'm having a hard enough of a time pushing 300/second, and 1180/second on a good day. My use-case for this small program will be nowhere near that. This program can initate more clicks per second than a lot of games' framerate anyway.
 
@@ -9,6 +9,11 @@ This is still in its infancy, and I hope to take this further. I have basic func
 * Start clicks without having program focused
 * Stop clicks without having program focused
 * Close program without having program focused
+* Display mouse position on Status Page
+* Display if currently clicking on Status Page
+* Optional programs built to measure clicks per second (this will likely be better than a browser if you have hundreds of tabs open like me)
+
+Optional programs built in C++ because Win32 API likes C++ just a little bit better than C. I could've found a way to do it purely in C, but OOP made it fly by just a bit quicker, and since these metric programs aren't the main focus here, I didn't want to do it in C. And as much of a pain `windows.h` is, I didn't want to fight against it more than necessary. `FactoryBuildFactoryToBuildSomeStructThatFeedsIntoAnotherClassToConstructALittleBrush`.
 
 ## Usage
 
@@ -16,6 +21,21 @@ This is still in its infancy, and I hope to take this further. I have basic func
 * Capslock + 4 - Closes Program
 
 The program will initiate another capslock keypress to return the capslock to the state it was before you entered a command.
+
+## Dependencies
+
+* Win32 API
+* (Everything in Vendor directory)
+* X11 (Future)
+* Wayland (Future)
+
+### Optional Program Dependencies
+
+* Win32 API
+* Direct2D API
+* DirectWrite API
+* X11 (Future)
+* Wayland (Future)
 
 ## Get / Build
 
@@ -36,8 +56,9 @@ I used a Makefile to control `cmake` commands because I didn't want to keep typi
 
 ## Compilers
 
-* MinGW
-* NASM
+* MinGW (Windows)
+* GCC (Linux (Future))
+* NASM (Windows/Linux)
 * https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/
   * Install is on user or global (windows) - add install dir to path
   * set nev var of `ASM_NASM` to `nasm.exe` (windows, user or global)
@@ -73,3 +94,11 @@ A cap of 100 clicks per second seems to be a safe max of what this program can d
 ### Garbage in Strings
 
 Pretty much this. I may be committing more atrocities, which is evidenced by occasional garbage in the Status page. I believe I addressed this with a couple of `memset`s, but a few eyes may be needed to make sure it's truly gone. Can't reproduce the garbage consistently.
+
+### Click Queue Buildup
+
+If the clicker is being ran for a bit, the click queue seems to build up and stopping the clicks is not immediate. The reason for this is trying to squeeze out more clicks by sending an input buffer with a length greater than 1 to `SendInput`.
+
+### Questionable Clicks Measuring Methodology
+
+I'm having to use GUI based programs to capture clicks. This in and of itself will introduce some inaccuracy in collecting the amount of clicks the program is actually initiating. I can use the program itself to give an *estimated* amount of clicks, but that's like asking a government agency to audit itself for any wrongdoing. Unreliable at best, and straight up fantasy land reporting at worst.

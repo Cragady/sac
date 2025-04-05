@@ -6,11 +6,6 @@
 typedef struct app_state AppState;
 
 typedef struct {
-  int32_t length;
-  char *str;
-} NudeContents;
-
-typedef struct {
   Clay_String title;
   Clay_String contents;
 } Document;

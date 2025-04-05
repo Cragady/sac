@@ -14,6 +14,8 @@
 #define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_DOCS_LEN 4
 #define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_DOC_POS 0
 #define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_BUFF 256
+#define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR "FAILED STR ALLOC IN CLAY_STRING"
+#define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR_BUFF 31
 
 void RenderHeaderButton(Clay_String text) {
   CLAY({
@@ -86,17 +88,13 @@ ClayVideo_Data ClayVideo_Initialize() {
   };
   status_str.chars = malloc(sizeof(char) * status_str.length);
   if (status_str.chars == NULL) {
-    status_str = CLAY_STRING("FAILED STR ALLOC IN CLAY_STRING");
+    status_str = CLAY_STRING(SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR);
   } else {
     memset((char *)status_str.chars, '\0', status_str.length);
   }
 
   ClayVideo_AddDocument(documents, (Document){ .title = CLAY_STRING("Status"), .contents = status_str, });
   ClayVideo_AddDocument(documents, (Document){ .title = CLAY_STRING("WIP"), .contents = CLAY_STRING(""), });
-typedef struct {
-  int is_used;
-  char *str;
-} NudeString;
 
   return data;
 }
@@ -108,10 +106,16 @@ void ClayVideo_UpdateData(DocumentArray *doc_array, AppState *state) {
 void ClayVideo_UpdateStatusData(DocumentArray *doc_array, AppState *state) {
   const int STATUS_INDEX = SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_DOC_POS;
   const int STR_BUFF = SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_BUFF;
+  const char *ERR_MSG = SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR;
+  const int ERR_MSG_BUFF = SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR_BUFF;
   const char *format_str = "Mouse Pos: (%i, %i)\n"
                            "Is Clicking: %s\n";
 
   const Document *WANTED_DOC = &doc_array->documents[STATUS_INDEX];
+  const char *WANTED_STR = WANTED_DOC->contents.chars;
+
+  if (!memcmp(WANTED_STR, ERR_MSG, ERR_MSG_BUFF))
+    return;
 
   const int MOUSE_POS_X = state->mouse_info.x;
   const int MOUSE_POS_Y = state->mouse_info.y;
@@ -123,12 +127,12 @@ void ClayVideo_UpdateStatusData(DocumentArray *doc_array, AppState *state) {
   // NOTE: I don't know if the following memset will fix the garbage issue I was
   // having; shit was cropping up in the strings.
   // returns num chars if n was sufficiently large enough
-  int chars_changed = snprintf((char *)WANTED_DOC->contents.chars, STR_BUFF, format_str, MOUSE_POS_X, MOUSE_POS_Y, clicking_t_f);
-  int offset = chars_changed < STR_BUFF - 1
+  int chars_changed = snprintf((char *)WANTED_STR, STR_BUFF, format_str, MOUSE_POS_X, MOUSE_POS_Y, clicking_t_f);
+  int offset = chars_changed <= STR_BUFF
     ? chars_changed
-    : 0;
+    : STR_BUFF;
 
-  memset((char *)WANTED_DOC->contents.chars + offset, '\0', STR_BUFF - offset);
+  memset((char *)WANTED_STR + offset, '\0', STR_BUFF - offset);
 }
 
 Clay_RenderCommandArray ClayVideo_CreateLayout(ClayVideo_Data *data) {
@@ -309,5 +313,6 @@ Clay_RenderCommandArray ClayVideo_CreateLayout(ClayVideo_Data *data) {
 #undef SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_DOCS_LEN
 #undef SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_DOC_POS
 #undef SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_BUFF
-
+#undef SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR
+#undef SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_STATUS_STR_ERR_BUFF
 #endif
