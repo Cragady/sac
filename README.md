@@ -50,6 +50,7 @@ I have an environment variable that sets the default target for cmake to be the 
 
 In the future I plan to:
 
+* Create a linux build, and modify cmake files to dynamically handle `Windows`, `X11`, and `Wayland`
 * Create a simple scripting language to move mouse and click mouse according to what's scripted, and to do it over time to ideally get close to human mouse movements and clicks
 * Create a text editor to modify an in-memory script
 * Create save functionality to save in-memory script to disk
