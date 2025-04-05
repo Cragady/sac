@@ -4,9 +4,12 @@ set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/sac.c
   # NOTE: for now, we exclude these items due to using the 'include' directive
   # used directly on the source files. Need to refactor this out.
-  # TODO: refactor out need to use 'include' directive on next two source files
+  # NOTE: Following may not be possible with CLAY? May be possible to pass
+  # context around w/appstate and re-define the measuretextfunction every
+  # time?
+  # TODO: refactor out need to use 'include' directive on next source file(s)
   # ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.c
-  # ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.c
+  # ${SAC_SOURCES_DIR}/shared-layouts/clay-video.c
   ${SAC_SOURCES_DIR}/input/input.c
   ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
   ${SAC_SOURCES_DIR}/keyboard/key_commands.c
@@ -17,10 +20,10 @@ set (SAC_SOURCES
 
 set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/sac.h
-  ${SAC_SOURCES_DIR}/examples/shared-layouts/clay-video-demo.h
   ${SAC_SOURCES_DIR}/input/input.h
-  ${SAC_SOURCES_DIR}/output/output.c
+  ${SAC_SOURCES_DIR}/output/output.h
   ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.h
+  ${SAC_SOURCES_DIR}/shared-layouts/clay-video.h
   ${SAC_SOURCES_DIR}/time/time.h
 )
 

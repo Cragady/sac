@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "SAC/sac.h"
 #include "mouse_commands.h"
 #include "SAC/output/output.h"
@@ -12,7 +10,6 @@ void handle_output_clicking(AppState *state) {
 
   l_click_mouse(mouse_x, mouse_y, state->click_batch_added_per_cycle);
 
-  printf("Is clicking now!! At x: %i, y: %i\n", mouse_x, mouse_y);
   state->cps_timer = 0;
   state->total_times_clicked++;
 }

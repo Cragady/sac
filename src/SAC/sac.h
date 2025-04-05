@@ -9,14 +9,15 @@
 #include <mouse_commands.h>
 #include <key_commands.h>
 
-#include "SAC/examples/shared-layouts/clay-video-demo.h"
+#include "SAC/shared-layouts/clay-video.h"
 #include "SAC/renderers/clay_renderer_SDL3.h"
 #include "SAC/time/time.h"
 
 typedef struct app_state {
+  Clay_Context *context;
   SDL_Window *window;
   Clay_SDL3RendererData rendererData;
-  ClayVideoDemo_Data demoData;
+  ClayVideo_Data videoData;
   SDL_AppResult sdl_result;
   delta_time_s d_time;
   mouse_info_s mouse_info;

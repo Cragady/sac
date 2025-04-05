@@ -17,12 +17,13 @@
 #include <stdio.h>
 
 #include "SAC/sac.h"
-#include "SAC/examples/shared-layouts/clay-video-demo.h"
-#include "SAC/examples/shared-layouts/clay-video-demo.c"
 #include "SAC/input/input.h"
 #include "SAC/output/output.h"
 #include "SAC/renderers/clay_renderer_SDL3.h"
+// TODO: find way to not do next line
 #include "SAC/renderers/clay_renderer_SDL3.c"
+#include "SAC/shared-layouts/clay-video.h"
+#include "SAC/shared-layouts/clay-video.c"
 #include "SAC/time/time.h"
 
 // NOTE: start globals
@@ -78,7 +79,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   state->input_timer_target = INPUT_TIMER_TARGET;
   state->click_batch_added_per_cycle = CLICK_BATCH_ADDED_PER_CYCLE;
 
-  if (!SDL_CreateWindowAndRenderer("Clay Demo", 640, 480, 0, &state->window,
+  if (!SDL_CreateWindowAndRenderer("SAC", 640, 480, 0, &state->window,
                                    &state->rendererData.renderer)) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
                  "Failed to create window and renderer: %s", SDL_GetError());
@@ -125,7 +126,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
                   (Clay_ErrorHandler){HandleClayErrors});
   Clay_SetMeasureTextFunction(SDL_MeasureText, state->rendererData.fonts);
 
-  state->demoData = ClayVideoDemo_Initialize();
+  state->videoData = ClayVideo_Initialize();
 
   *appstate = state;
   return SDL_APP_CONTINUE;
@@ -173,8 +174,10 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   handle_output_clicking(state);
 
+  // Clay_Context *missing_context = Clay_GetCurrentContext();
+  ClayVideo_UpdateData(&state->videoData.documents, state);
   Clay_RenderCommandArray render_commands =
-      ClayVideoDemo_CreateLayout(&state->demoData);
+      ClayVideo_CreateLayout(&state->videoData);
 
   SDL_SetRenderDrawColor(state->rendererData.renderer, 0, 0, 0, 255);
   SDL_RenderClear(state->rendererData.renderer);

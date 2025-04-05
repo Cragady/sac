@@ -4,8 +4,8 @@
 #include "SAC/examples/shared-layouts/clay-video-demo.h"
 
 // NOTE: start globals
-const int FONT_ID_BODY_16 = 0;
-Clay_Color COLOR_WHITE = { 255, 255, 255, 255};
+const int SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16 = 0;
+Clay_Color SAC_SHARED_LAYOUTS_CLAY_VIDEO_COLOR_WHITE = { 255, 255, 255, 255};
 
 Document documentsRaw[5];
 
@@ -22,7 +22,7 @@ void RenderHeaderButton(Clay_String text) {
         .cornerRadius = CLAY_CORNER_RADIUS(5)
     }) {
         CLAY_TEXT(text, CLAY_TEXT_CONFIG({
-            .fontId = FONT_ID_BODY_16,
+            .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
             .fontSize = 16,
             .textColor = { 255, 255, 255, 255 }
         }));
@@ -32,7 +32,7 @@ void RenderHeaderButton(Clay_String text) {
 void RenderDropdownMenuItem(Clay_String text) {
     CLAY({.layout = { .padding = CLAY_PADDING_ALL(16)}}) {
         CLAY_TEXT(text, CLAY_TEXT_CONFIG({
-            .fontId = FONT_ID_BODY_16,
+            .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
             .fontSize = 16,
             .textColor = { 255, 255, 255, 255 }
         }));
@@ -112,7 +112,7 @@ Clay_RenderCommandArray ClayVideoDemo_CreateLayout(ClayVideoDemo_Data *data) {
                 .cornerRadius = CLAY_CORNER_RADIUS(5)
             }) {
                 CLAY_TEXT(CLAY_STRING("File"), CLAY_TEXT_CONFIG({
-                    .fontId = FONT_ID_BODY_16,
+                    .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
                     .fontSize = 16,
                     .textColor = { 255, 255, 255, 255 }
                 }));
@@ -190,7 +190,7 @@ Clay_RenderCommandArray ClayVideoDemo_CreateLayout(ClayVideoDemo_Data *data) {
                             .cornerRadius = CLAY_CORNER_RADIUS(8)
                         }) {
                             CLAY_TEXT(document.title, CLAY_TEXT_CONFIG({
-                                .fontId = FONT_ID_BODY_16,
+                                .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
                                 .fontSize = 20,
                                 .textColor = { 255, 255, 255, 255 }
                             }));
@@ -202,7 +202,7 @@ Clay_RenderCommandArray ClayVideoDemo_CreateLayout(ClayVideoDemo_Data *data) {
                         CLAY({ .layout = sidebarButtonLayout, .backgroundColor = (Clay_Color) { 120, 120, 120, Clay_Hovered() ? 120 : 0 }, .cornerRadius = CLAY_CORNER_RADIUS(8) }) {
                             Clay_OnHover(HandleSidebarInteraction, (intptr_t)clickData);
                             CLAY_TEXT(document.title, CLAY_TEXT_CONFIG({
-                                .fontId = FONT_ID_BODY_16,
+                                .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
                                 .fontSize = 20,
                                 .textColor = { 255, 255, 255, 255 }
                             }));
@@ -223,14 +223,14 @@ Clay_RenderCommandArray ClayVideoDemo_CreateLayout(ClayVideoDemo_Data *data) {
             }) {
                 Document selectedDocument = documents.documents[data->selectedDocumentIndex];
                 CLAY_TEXT(selectedDocument.title, CLAY_TEXT_CONFIG({
-                    .fontId = FONT_ID_BODY_16,
+                    .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
                     .fontSize = 24,
-                    .textColor = COLOR_WHITE
+                    .textColor = SAC_SHARED_LAYOUTS_CLAY_VIDEO_COLOR_WHITE
                 }));
                 CLAY_TEXT(selectedDocument.contents, CLAY_TEXT_CONFIG({
-                    .fontId = FONT_ID_BODY_16,
+                    .fontId = SAC_SHARED_LAYOUTS_CLAY_VIDEO_FONT_ID_BODY_16,
                     .fontSize = 24,
-                    .textColor = COLOR_WHITE
+                    .textColor = SAC_SHARED_LAYOUTS_CLAY_VIDEO_COLOR_WHITE
                 }));
             }
         }
