@@ -9,7 +9,7 @@ compile-commands:
 # NOTE: -D flag(s) may not be needed on linux
 cmake:
 	# cmake -S . -B build -DSDLTTF_VENDORED=TRUE -DSDLIMAGE_VENDORED=TRUE
-	cmake -S . -B build -DSDLTTF_VENDORED=TRUE
+	cmake -S . -B build -DSDLTTF_VENDORED=TRUE -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 .PHONY : cmake
 
