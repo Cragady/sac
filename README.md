@@ -67,6 +67,10 @@ I used a Makefile to control `cmake` commands because I didn't want to keep typi
 
 I have an environment variable that sets the default target for cmake to be the `MinGW64` compiler. For Windows, Cmake usually defaults to Visual Studio.
 
+```sh
+CMAKE_GENERATOR=MinGW Makefiles
+```
+
 ## Future Plans
 
 In the future I plan to:
