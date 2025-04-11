@@ -1,6 +1,6 @@
 # SAC (Simple Auto Clicker)
 
-This repo is meant to be a simple auto-clicker created in `C` using the `clay` lib. I'm developing this for `Windows` first, then eventually maybe for `Linux` targeting `X11`, and maybe `Wayland` if I'm feeling ambitious enough. The reason I need to target these items is so that I can initiate clicks as if it's coming from the OS. On Windows, I can do this with `windows.h`. I haven't delved too deeply in OS specific GUI development, so I don't know what that would look like on Linux - Maybe it's something different, or maybe it's as I mentioned before: `X11` and/or `Wayland` to help me initiate clicks without the program having focus.
+This repo is meant to be a simple auto-clicker created in `C` using the `cimgui` lib wrapper for `imgui`. I'm developing this for `Windows` first, then eventually maybe for `Linux` targeting `X11`, and maybe `Wayland` if I'm feeling ambitious enough. The reason I need to target these items is so that I can initiate clicks as if it's coming from the OS. On Windows, I can do this with `windows.h`. I haven't delved too deeply in OS specific GUI development, so I don't know what that would look like on Linux - Maybe it's something different, or maybe it's as I mentioned before: `X11` and/or `Wayland` to help me initiate clicks without the program having focus.
 
 There are some auto-clickers that claim to be as fast as 50k/second, and that quite frankly, is amazing if true. I'm having a hard enough of a time pushing 300/second, and 1180/second on a good day. My use-case for this small program will be nowhere near that. This program can initate more clicks per second than a lot of games' framerate anyway.
 
@@ -14,6 +14,10 @@ This is still in its infancy, and I hope to take this further. I have basic func
 * Optional programs built to measure clicks per second (this will likely be better than a browser if you have hundreds of tabs open like me)
 
 Optional programs built in C++ because Win32 API likes C++ just a little bit better than C. I could've found a way to do it purely in C, but OOP made it fly by just a bit quicker, and since these metric programs aren't the main focus here, I didn't want to do it in C. And as much of a pain `windows.h` is, I didn't want to fight against it more than necessary. `FactoryBuildFactoryToBuildSomeStructThatFeedsIntoAnotherClassToConstructALittleBrush`.
+
+## Clay to ImGui
+
+As of the commit that this readme update is happening, I'll be moving from Clay to ImGui. There may be what I'm looking for in Clay, but I know where it is in ImGui without loafing through a lot of code. I want an input field that handles input, but I also do not want to have to build it myself. That could possibly be a latter project, but for now I want to focus on the auto-clicker part of this project.
 
 ## Usage
 
