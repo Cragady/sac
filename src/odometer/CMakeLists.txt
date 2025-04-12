@@ -44,7 +44,7 @@ target_include_directories(win_odometer
 # endif()
 
 set_target_properties(win_odometer PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  RUNTIME_OUTPUT_DIRECTORY "${BUILD_OUTPUT}/bin"
 )
 
 
@@ -60,6 +60,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(test_win_odometer test_win_odometer.cpp)
 
 set_target_properties(test_win_odometer PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  RUNTIME_OUTPUT_DIRECTORY "${BUILD_OUTPUT}/bin"
 )
 

@@ -2,14 +2,6 @@
 # on the target
 set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/sac.c
-  # NOTE: for now, we exclude these items due to using the 'include' directive
-  # used directly on the source files. Need to refactor this out.
-  # NOTE: Following may not be possible with CLAY? May be possible to pass
-  # context around w/appstate and re-define the measuretextfunction every
-  # time?
-  # TODO: refactor out need to use 'include' directive on next source file(s)
-  # ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.c
-  # ${SAC_SOURCES_DIR}/shared-layouts/clay-video.c
   ${SAC_SOURCES_DIR}/input/input.c
   ${SAC_SOURCES_DIR}/keyboard/win_key_commands.c
   ${SAC_SOURCES_DIR}/keyboard/key_commands.c
@@ -22,8 +14,7 @@ set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/sac.h
   ${SAC_SOURCES_DIR}/input/input.h
   ${SAC_SOURCES_DIR}/output/output.h
-  ${SAC_SOURCES_DIR}/renderers/clay_renderer_SDL3.h
-  ${SAC_SOURCES_DIR}/shared-layouts/clay-video.h
+  ${SAC_SOURCES_DIR}/renderers/renderer_SDL3.h
   ${SAC_SOURCES_DIR}/time/time.h
 )
 
@@ -45,11 +36,13 @@ target_include_directories(SAClib
   $<BUILD_INTERFACE:${SAC_SOURCES_DIR}/..>
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
-target_link_libraries(SAClib PUBLIC SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf SDL3::SDL3)
+# target_link_libraries(SAClib PUBLIC SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf SDL3::SDL3 glfw Vulkan::Vulkan cglm)
+target_link_libraries(SAClib PUBLIC SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf SDL3::SDL3 Vulkan::Vulkan cglm cimgui)
 
 add_executable(SAC main.c)
+target_compile_definitions(SAC PUBLIC -DCIMGUI_USE_VULKAN -DCIMGUI_USE_SDL3)
+# target_compile_options(SAC PRIVATE "-g")
 target_link_libraries(SAC PUBLIC SAClib)
 target_include_directories(SAC PUBLIC ${SAC_INCLUDE_DIRS})
-set_target_properties(SAC PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT})
+set_target_properties(SAC PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT}/bin)
 
-add_subdirectory(odometer ${BUILD_OUTPUT}/odometer)

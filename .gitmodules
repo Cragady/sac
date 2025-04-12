@@ -10,3 +10,12 @@
 [submodule "vendor/clay"]
 	path = vendor/clay
 	url = git@github.com:nicbarker/clay.git
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = git@github.com:glfw/glfw
+[submodule "vendor/cglm"]
+	path = vendor/cglm
+	url = git@github.com:recp/cglm
+[submodule "vendor/cimgui"]
+	path = vendor/cimgui
+	url = git@github.com:cimgui/cimgui

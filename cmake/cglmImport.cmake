@@ -1,0 +1,16 @@
+if (NOT TARGET cglm)
+
+  project(cglm)
+
+
+  set(CMAKE_CURRENT_BINARY_DIR_BAK ${CMAKE_CURRENT_BINARY_DIR})
+  set(CMAKE_CURRENT_BINARY_DIR ${BUILD_OUTPUT})
+  set(CGLM_SOURCES_DIR "${CMAKE_SOURCE_DIR}/vendor/cglm")
+
+  add_subdirectory("${CGLM_SOURCES_DIR}" ${BUILD_OUTPUT}/cglm_cmake)
+
+
+  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR_BAK})
+  unset(CMAKE_CURRENT_BINARY_DIR_BAK)
+
+endif()

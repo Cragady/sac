@@ -4,7 +4,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 
-#include "SAC/renderers/clay_renderer_SDL3.h"
+#include "SAC/renderers/renderer_SDL3.h"
 
 // NOTE: start globals
 /* Global for convenience. Even in 4K this is enough for smooth curves (low radius or rect size coupled with

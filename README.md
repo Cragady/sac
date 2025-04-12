@@ -32,6 +32,13 @@ The program will initiate another capslock keypress to return the capslock to th
 * (Everything in Vendor directory)
 * X11 (Future)
 * Wayland (Future)
+* Vulkan
+* Make
+* CMake
+
+### Required Installs
+
+* [Vulkan](https://vulkan.lunarg.com/sdk/home)
 
 ### Optional Program Dependencies
 

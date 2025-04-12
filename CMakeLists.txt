@@ -18,7 +18,7 @@ set(BUILD_OUTPUT ${CMAKE_SOURCE_DIR}/build)
 set(SAC_SOURCES_DIR ${CMAKE_SOURCE_DIR}/src/SAC)
 
 # NOTE: missing the next line caused a big headache
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BUILD_OUTPUT}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_OUTPUT}/lib)
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -32,10 +32,15 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 file(COPY "${CMAKE_SOURCE_DIR}/assets" DESTINATION "${BUILD_OUTPUT}")
 
+include(vulkanImport)
 include(clayImport)
 include(SDLImport)
 include(SDL_imageImport)
 include(SDL_ttfImport)
+# include(glfwImport)
+include(cglmImport)
+include(cimguiImport)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -43,4 +48,6 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 add_subdirectory(src ${BUILD_OUTPUT}/SAC_SRC)
+add_subdirectory(src/odometer ${BUILD_OUTPUT}/odometer)
+add_subdirectory(src/examples ${BUILD_OUTPUT}/examples)
 
