@@ -8,6 +8,7 @@ set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/mouse/win_mouse.c
   ${SAC_SOURCES_DIR}/output/output.c
   ${SAC_SOURCES_DIR}/time/time.c
+  ${SAC_SOURCES_DIR}/vulkan/setup.c
 )
 
 set (SAC_HEADERS
@@ -16,6 +17,7 @@ set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/output/output.h
   ${SAC_SOURCES_DIR}/renderers/renderer_SDL3.h
   ${SAC_SOURCES_DIR}/time/time.h
+  ${SAC_SOURCES_DIR}/vulkan/setup.h
 )
 
 set(SAC_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
@@ -28,8 +30,9 @@ list(REMOVE_DUPLICATES SAC_INCLUDE_DIRS)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 
+# TODO: find out why SHARED causes a linker error with being unable to find `setup.c`
 # NOTE: Save
-add_library(SAClib ${SAC_HEADERS} ${SAC_SOURCES})
+add_library(SAClib STATIC ${SAC_HEADERS} ${SAC_SOURCES})
 
 target_include_directories(SAClib
   PUBLIC

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_COMMON_H
-#define INCLUDE_COMMON_H
+#ifndef INCLUDE_COMMON_H_
+#define INCLUDE_COMMON_H_
 
 #define BYTE_256 256
 #define BYTE_512 512

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_X_KEY_COMMANDS_H
-#define INCLUDE_X_KEY_COMMANDS_H
+#ifndef INCLUDE_X_KEY_COMMANDS_H_
+#define INCLUDE_X_KEY_COMMANDS_H_
 
 #include <SDL3/SDL_init.h>
 

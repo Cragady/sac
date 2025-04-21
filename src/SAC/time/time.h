@@ -1,5 +1,5 @@
-#ifndef SAC_TIME_TIME_H
-#define SAC_TIME_TIME_H
+#ifndef SAC_TIME_TIME_H_
+#define SAC_TIME_TIME_H_
 
 #include "SDL3/SDL_stdinc.h"
 

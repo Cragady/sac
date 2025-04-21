@@ -1,5 +1,5 @@
-#ifndef INCLUDE_KEY_COMMANDS_H
-#define INCLUDE_KEY_COMMANDS_H
+#ifndef INCLUDE_KEY_COMMANDS_H_
+#define INCLUDE_KEY_COMMANDS_H_
 
 #include <common.h>
 #include <stdbool.h>

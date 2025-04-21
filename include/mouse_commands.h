@@ -1,5 +1,5 @@
-#ifndef INCLUDE_MOUSE_COMMANDS_H
-#define INCLUDE_MOUSE_COMMANDS_H
+#ifndef INCLUDE_MOUSE_COMMANDS_H_
+#define INCLUDE_MOUSE_COMMANDS_H_
 
 #include <stdbool.h>
 

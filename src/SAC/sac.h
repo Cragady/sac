@@ -1,5 +1,5 @@
-#ifndef SAC_SAC_H
-#define SAC_SAC_H
+#ifndef SAC_SAC_H_
+#define SAC_SAC_H_
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
