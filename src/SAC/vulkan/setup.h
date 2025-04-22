@@ -23,6 +23,8 @@
 #define igButton igButton_Str
 #endif
 
+// TODO: FIX DEFS OF IG_GET_IO
+// TODO: MOVE TO IMGUI SPECIFIC SETUP
 #define igGetIO igGetIO_Nil
 
 #define IM_UNUSED(_VAR)  ((void)(_VAR))
@@ -36,6 +38,7 @@
 #define APP_USE_VULKAN_DEBUG_REPORT
 
 typedef struct GVulkan_s GVulkan;
+typedef struct app_state AppState;
 
 typedef GVulkan *PGVulkan;
 
@@ -48,6 +51,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, VkDebug
 #endif
 
 
+int SetupVulkanWrapper(AppState *state);
 void PopInitData(PGVulkan app_state);
 bool IsExtensionAvailable(VkExtensionProperties* properties, uint32_t properties_count, const char* extension);
 void SetupVulkan(const char** extensions, uint32_t extensions_count, PGVulkan app_state);

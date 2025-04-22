@@ -6,6 +6,56 @@
 #include "SAC/sac.h"
 #include "SAC/vulkan/setup.h"
 
+int SetupVulkanWrapper(AppState *state) {
+  // Setup Vulkan
+  uint32_t extensions_count = 0;
+  PGVulkan vulkan_state = &state->vulkan_globals;
+
+  // TODO: see if the following is sufficient as an alternative, or needed
+  // The lines after the next sets up Vulkan
+  // vkEnumerateInstanceExtensionProperties(NULL, &extensions_count, NULL);
+
+  const char *const *extensions_nude = SDL_Vulkan_GetInstanceExtensions(&extensions_count);
+  if (extensions_nude == NULL) {
+    printf("Error: SDL_Vulkan_GetInstanceExtensions(): %s\n", SDL_GetError());
+    return -1;
+  }
+  const char** extensions = (const char**)malloc(extensions_count * sizeof(const char*));
+  if (extensions == NULL) {
+    printf("Error allocating space for extensions array\n");
+    return -1;
+  }
+
+  for (int i = 0; i < extensions_count; i++) {
+    extensions[i] = extensions_nude[i];
+  }
+
+  SetupVulkan(extensions, extensions_count, vulkan_state);
+  //leak?? but free crashes
+  // free(extensions);
+  // Create Window Surface
+  VkSurfaceKHR surface;
+  VkResult err;
+  if (SDL_Vulkan_CreateSurface(state->window, vulkan_state->instance, vulkan_state->allocator, &surface) == 0) {
+    printf("Failed to create Vulkan surface.\n");
+    return 1;
+  }
+
+  printf("SETUP: %i extensions supported\n", extensions_count);
+
+  // Create Framebuffers
+  printf("SETUP: Create FrameBuffers\n");
+  {
+    int w, h;
+    SDL_GetWindowSize(state->window, &w, &h);
+    SetupVulkanWindow(vulkan_state, &vulkan_state->mainWindowData, surface, w, h);
+    SDL_SetWindowPosition(state->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_ShowWindow(state->window);
+  }
+
+  return 0;
+}
+
 void PopInitData(PGVulkan app_state) {
   app_state->allocator = NULL;
   app_state->instance = VK_NULL_HANDLE;

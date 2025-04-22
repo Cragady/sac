@@ -20,10 +20,6 @@
 #include <volk.h>
 #endif
 
-#include <cglm/struct.h>
-#include <cglm/mat4.h>
-#include <cglm/quat.h>
-
 #include <mouse_commands.h>
 #include <key_commands.h>
 #include <x_key_commands.h>
@@ -32,13 +28,14 @@
 #include "SAC/vulkan/setup.h"
 
 #include "SAC/sac.h"
+#include "SAC/cglm/misc.h"
 #include "SAC/input/input.h"
 #include "SAC/output/output.h"
+#include "SAC/renderers/r_fonts.h"
+#include "SAC/renderers/r_imgui.h"
 #include "SAC/time/time.h"
 
 // NOTE: start globals
-static const Uint32 FONT_ID = 0;
-
 static const double CPS_TIMER_TARGET = 1.0 / 500;
 static const double INPUT_TIMER_TARGET = 0.250;
 static const int CLICK_BATCH_ADDED_PER_CYCLE = 5;
@@ -46,20 +43,20 @@ static const int CLICK_BATCH_ADDED_PER_CYCLE = 5;
 // NOTE: end globals
 
 
-// static inline Clay_Dimensions SDL_MeasureText(Clay_StringSlice text,
-//                                               Clay_TextElementConfig *config,
-//                                               void *userData) {
-//   TTF_Font **fonts = userData;
-//   TTF_Font *font = fonts[config->fontId];
-//   int width, height;
-//
-//   if (!TTF_GetStringSize(font, text.chars, text.length, &width, &height)) {
-//     SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to measure text: %s",
-//                  SDL_GetError());
-//   }
-//
-//   return (Clay_Dimensions){(float)width, (float)height};
-// }
+static inline Sac_Dimensions SDL_MeasureText(Sac_StringSlice text,
+                                              uint16_t font_id,
+                                              void *userData) {
+  TTF_Font **fonts = userData;
+  TTF_Font *font = fonts[font_id];
+  int width, height;
+
+  if (!TTF_GetStringSize(font, text.chars, text.length, &width, &height)) {
+    SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to measure text: %s",
+                 SDL_GetError());
+  }
+
+  return (Sac_Dimensions){(float)width, (float)height};
+}
 
 // void HandleClayErrors(Clay_ErrorData errorData) {
 //   printf("%s", errorData.errorText.chars);
@@ -115,171 +112,25 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_FAILURE;
   }
 
-  // Setup Vulkan
-  uint32_t extensions_count = 0;
+  int setup_failure = SetupVulkanWrapper(state);
+  if (setup_failure) {
+    return setup_failure;
+  }
+
   PGVulkan vulkan_state = &state->vulkan_globals;
 
-  // TODO: see if the following is sufficient as an alternative, or needed
-  // The lines after the next sets up Vulkan
-  // vkEnumerateInstanceExtensionProperties(NULL, &extensions_count, NULL);
-
-  const char *const *extensions_nude = SDL_Vulkan_GetInstanceExtensions(&extensions_count);
-  if (extensions_nude == NULL) {
-    printf("Error: SDL_Vulkan_GetInstanceExtensions(): %s\n", SDL_GetError());
-    return -1;
-  }
-  const char** extensions = (const char**)malloc(extensions_count * sizeof(const char*));
-  if (extensions == NULL) {
-    printf("Error allocating space for extensions array\n");
-    return -1;
-  }
-
-  for (int i = 0; i < extensions_count; i++) {
-    extensions[i] = extensions_nude[i];
-  }
-
-  SetupVulkan(extensions, extensions_count, vulkan_state);
-  //leak?? but free crashes
-  // free(extensions);
-  // Create Window Surface
-  VkSurfaceKHR surface;
-  VkResult err;
-  if (SDL_Vulkan_CreateSurface(state->window, vulkan_state->instance, vulkan_state->allocator, &surface) == 0) {
-    printf("Failed to create Vulkan surface.\n");
-    return 1;
-  }
-
-
-  printf("SETUP: %i extensions supported\n", extensions_count);
-
-  // Simple Test for CGLM
-  printf("SETUP: Simple Test for CGLM\n");
-  mat4 matrix;
-  glm_mat4_identity(matrix);
-  vec4 vec;
-  versor quat;
-  glm_quat_identity(quat);
-  mat4 rot;
-  glm_quat_mat4(quat, rot);
-  mat4 test;
-  // t x r x m
-  glm_mul(matrix, rot, test);
-
-  // for (int i = 0; i < 4; i++) {
-  //   for (int j = 0; j < 4; j++) {
-  //     printf("%f\n", test[i][j]);
-  //   }
-  // }
-
-  // Create Framebuffers
-  printf("SETUP: Create FrameBuffers\n");
-  ImGui_ImplVulkanH_Window* wd;
-  {
-    int w, h;
-    SDL_GetWindowSize(state->window, &w, &h);
-    wd = &vulkan_state->mainWindowData;
-    SetupVulkanWindow(vulkan_state, &vulkan_state->mainWindowData, surface, w, h);
-    SDL_SetWindowPosition(state->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_ShowWindow(state->window);
-  }
-
+  cglm_well_priming_test();
 
   // Window Resizables
   printf("SETUP: Window Resizables\n");
   SDL_SetWindowResizable(state->window, true);
 
-  // Setup Dear ImGui context
-  printf("SETUP: Dear ImGui context\n");
-  //IMGUI_CHECKVERSION();
-  igCreateContext(NULL);
-  state->vulkan_globals.io = igGetIO();
-  ImGuiIO *io = state->vulkan_globals.io;
-  (void)io;
-  io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-  io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-  io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-  io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-  //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-  //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+  setup_r_imgui(state);
 
-  // Setup Dear ImGui style
-  printf("SETUP: Dear ImGui style\n");
-  igStyleColorsDark(NULL);
-  //ImGui::StyleColorsLight();
-
-  // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-  ImGuiStyle* style = igGetStyle();
-  if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    style->WindowRounding = 0.0f;
-    style->Colors[ImGuiCol_WindowBg].w = 1.0f;
+  int font_setup_failure = setup_r_fonts(state);
+  if (font_setup_failure) {
+    return state->sdl_result;
   }
-
-  // Setup Platform/Renderer backends
-  printf("SETUP: Platform/Renderer backends\n");
-  ImGui_ImplSDL3_InitForVulkan(state->window);
-  ImGui_ImplVulkan_InitInfo init_info = {};
-  init_info.Instance = vulkan_state->instance;
-  init_info.PhysicalDevice = vulkan_state->physicalDevice;
-  init_info.Device = vulkan_state->device;
-  init_info.QueueFamily = vulkan_state->queueFamily;
-  init_info.Queue = vulkan_state->queue;
-  init_info.PipelineCache = vulkan_state->pipelineCache;
-  init_info.DescriptorPool = vulkan_state->descriptorPool;
-  init_info.RenderPass = wd->RenderPass;
-  init_info.Subpass = 0;
-  init_info.MinImageCount = vulkan_state->minImageCount;
-  init_info.ImageCount = wd->ImageCount;
-  init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-  init_info.Allocator = vulkan_state->allocator;
-  init_info.CheckVkResultFn = check_vk_result;
-  ImGui_ImplVulkan_Init(&init_info);
-
-
-  // TODO: Figure out how you want to handle text
-  printf("SETUP: Load fonts\n");
-  printf("TODO: configure fonts correctly\n");
-  // Text Shit
-  // Load Fonts
-  // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-  // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-  // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-  // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-  // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-  // - Read 'docs/FONTS.md' for more instructions and details.
-  // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-  //io.Fonts->AddFontDefault();
-  //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-  //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-  //IM_ASSERT(font != nullptr);
-  // TODO: figure if wanted?
-  // state->rendererData.textEngine =
-  //     TTF_CreateRendererTextEngine(state->rendererData.renderer);
-  // if (!state->rendererData.textEngine) {
-  //   SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-  //                "Failed to create text engine from renderer: %s",
-  //                SDL_GetError());
-  //   return SDL_APP_FAILURE;
-  // }
-
-  // state->rendererData.fonts = SDL_calloc(1, sizeof(TTF_Font *));
-  // if (!state->rendererData.fonts) {
-  //   SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-  //                "Failed to allocate memory for the font array: %s",
-  //                SDL_GetError());
-  //   return SDL_APP_FAILURE;
-  // }
-
-  // TTF_Font *font = TTF_OpenFont("assets/Roboto-Regular.ttf", 24);
-  // if (!font) {
-  //   SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load font: %s",
-  //                SDL_GetError());
-  //   return SDL_APP_FAILURE;
-  // }
-
-  // state->rendererData.fonts[FONT_ID] = font;
 
   // WARN: Image for some reason - currently unused
   // sample_image = IMG_Load("assets/sample.png");
