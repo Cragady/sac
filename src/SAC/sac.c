@@ -108,7 +108,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   //                "Error: SDL_CreateWindowAndRenderer(): %s", SDL_GetError());
   //   return SDL_APP_FAILURE;
   // }
-  state->window = SDL_CreateWindow("SAC", 640, 480, window_flags);
+  state->window = SDL_CreateWindow("SAC", 1280, 720, window_flags);
   if (state->window == NULL) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
                  "Error: SDL_CreateWindowAndRenderer(): %s", SDL_GetError());
