@@ -35,22 +35,7 @@
 #endif
 #define APP_USE_VULKAN_DEBUG_REPORT
 
-
-typedef struct GVulkan_s {
-  VkAllocationCallbacks    *allocator;
-  VkInstance               instance;
-  VkPhysicalDevice         physicalDevice;
-  VkDevice                 device;
-  uint32_t                 queueFamily;
-  VkQueue                  queue;
-  VkDebugReportCallbackEXT debugReport;
-  VkPipelineCache          pipelineCache;
-  VkDescriptorPool         descriptorPool;
-
-  ImGui_ImplVulkanH_Window mainWindowData;
-  uint32_t                 minImageCount;
-  bool                     swapChainRebuild;
-} GVulkan;
+typedef struct GVulkan_s GVulkan;
 
 typedef GVulkan *PGVulkan;
 

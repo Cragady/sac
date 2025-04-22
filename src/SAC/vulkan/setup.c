@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "SAC/sac.h"
 #include "SAC/vulkan/setup.h"
 
 void PopInitData(PGVulkan app_state) {

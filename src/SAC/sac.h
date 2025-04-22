@@ -9,6 +9,25 @@
 
 #include "SAC/renderers/renderer_SDL3.h"
 #include "SAC/time/time.h"
+#include "SAC/vulkan/setup.h"
+
+typedef struct GVulkan_s {
+  VkAllocationCallbacks    *allocator;
+  VkInstance               instance;
+  VkPhysicalDevice         physicalDevice;
+  VkDevice                 device;
+  uint32_t                 queueFamily;
+  VkQueue                  queue;
+  VkDebugReportCallbackEXT debugReport;
+  VkPipelineCache          pipelineCache;
+  VkDescriptorPool         descriptorPool;
+
+  ImGui_ImplVulkanH_Window mainWindowData;
+  uint32_t                 minImageCount;
+  bool                     swapChainRebuild;
+
+  ImGuiIO                  *io;
+} GVulkan;
 
 typedef struct app_state {
   SDL_Window *window;
@@ -26,6 +45,10 @@ typedef struct app_state {
   double input_timer;
   bool should_click;
   int click_batch_added_per_cycle;
+  bool show_demo;
+  bool show_another_window;
+  ImVec4 clear_color;
+  GVulkan vulkan_globals;
 } AppState;
 
 #endif
