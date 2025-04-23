@@ -59,6 +59,7 @@ static inline Sac_Dimensions SDL_MeasureText(Sac_StringSlice text,
   return (Sac_Dimensions){(float)width, (float)height};
 }
 
+// TODO: guard setup print statements with a compiler or env variable
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   (void)argc;
   (void)argv;
@@ -207,7 +208,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   //   return state->sdl_result;
   // }
 
-  ImGuiVideo_UpdateData(&state->video_data.documents, state);
+  ImGuiVideo_UpdateData(state->video_data.status_node, state);
 
   // TODO: see what is wanted or needed from below
   // SDL_SetRenderDrawColor(state->rendererData.renderer, 0, 0, 0, 255);

@@ -9,10 +9,15 @@
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_FONT_ID_BODY_16 0
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_COLOR_WHITE { 255, 255, 255, 255}
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_DOCS_LEN 4
-#define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_DOC_POS 0
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_BUFF 256
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR "FAILED STR ALLOC IN IMGUI_STRING"
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR_BUFF 31
+
+Document *ImGuiVideo_CreateDocNode(Document *doc) {
+  doc->next = NULL;
+  doc->child = NULL;
+  return doc;
+}
 
 int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
   if (doc_array->length == doc_array->max_length) return 1;
@@ -21,6 +26,27 @@ int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
   return 0;
 }
 
+int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
+
+  Document *new_node = malloc(sizeof(Document));
+  if (new_node == NULL) {
+    printf("Error in allocating next!");
+    return -1;
+  }
+
+  *new_node = *linked_node;
+
+  switch (direction) {
+    case DOCUMENT_NODE_DIRECTION_E_NEXT:
+      current_node->next = new_node;
+      break;
+    case DOCUMENT_NODE_DIRECTION_E_CHILD:
+      current_node->child = new_node;
+      break;
+  }
+
+  return 0;
+}
 
 ImGuiVideo_Data ImGuiVideo_Initialize() {
   const size_t DOC_LEN = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_DOCS_LEN;
@@ -28,15 +54,24 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
     .documents = {
       .max_length = DOC_LEN,
       .length = 0,
-      .documents = malloc(sizeof(Document) * DOC_LEN),
+      // .documents = malloc(sizeof(Document) * DOC_LEN),
+      .documents = NULL,
     },
+    .root_node = malloc(sizeof(Document)),
+    .status_node = malloc(sizeof(Document)),
     .allocation_failure = false,
   };
 
-  DocumentArray *documents = &data.documents;
+  // DocumentArray *documents = &data.documents;
 
-  if (documents->documents == NULL) {
-    data.allocation_failure = true;
+  // if (documents->documents == NULL) {
+  //   data.allocation_failure = true;
+  //   return data;
+  // }
+
+  if (data.root_node == NULL || data.status_node == NULL) {
+    if (data.root_node) free(data.root_node);
+    if (data.status_node) free(data.status_node);
     return data;
   }
 
@@ -51,26 +86,39 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
     memset((char *)status_str.chars, '\0', status_str.length);
   }
 
-  ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("Status"), .contents = status_str, .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
-  ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
+  // ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("Status"), .contents = status_str, .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
+  // ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
+  Document *root_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("ControlTabBar"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_BAR, .is_open = true, });
+  Document *info_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Status"), .contents = status_str, .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+
+  // NOTE: add last siblings first (reverse order), then add that node as a child to parent
+  // TODO: actually check if adding node was successful
+  // TODO: handle allocation failures
+  ImGuiVideo_AddDocNode(settings_node, script_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
+  ImGuiVideo_AddDocNode(info_node, settings_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
+  ImGuiVideo_AddDocNode(root_node, info_node, DOCUMENT_NODE_DIRECTION_E_CHILD);
+
+  *data.root_node = *root_node;
+  *data.status_node = *info_node;
 
   return data;
 }
 
-void ImGuiVideo_UpdateData(DocumentArray *doc_array, AppState *state) {
-  ImGuiVideo_UpdateStatusData(doc_array, state);
+void ImGuiVideo_UpdateData(Document *status_node, AppState *state) {
+  ImGuiVideo_UpdateStatusData(status_node, state);
 }
 
 // TODO: review logic in this function
-void ImGuiVideo_UpdateStatusData(DocumentArray *doc_array, AppState *state) {
-  const int STATUS_INDEX = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_DOC_POS;
+void ImGuiVideo_UpdateStatusData(Document *status_node, AppState *state) {
   const int STR_BUFF = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_BUFF;
   const char *ERR_MSG = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR;
   const int ERR_MSG_BUFF = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR_BUFF;
   const char *format_str = "Mouse Pos: (%i, %i)\n"
                            "Is Clicking: %s\n";
 
-  const Document *WANTED_DOC = &doc_array->documents[STATUS_INDEX];
+  const Document *WANTED_DOC = status_node;
   const char *WANTED_STR = WANTED_DOC->contents.chars;
 
   if (!memcmp(WANTED_STR, ERR_MSG, ERR_MSG_BUFF))
@@ -96,46 +144,55 @@ void ImGuiVideo_UpdateStatusData(DocumentArray *doc_array, AppState *state) {
 
 void ImGuiVideo_RenderDocuments(ImGuiVideo_Data *data) {
   igBegin("Hello, ImGuiVideo!", NULL, 0);
-  bool tabs_active = false;
-  size_t next_tab_item = -1;
 
-  for (size_t i = 0; i < data->documents.length; i++) {
-    Document *current_item = &data->documents.documents[i];
-    Document *next_item = i + 1 < data->documents.length
-      ? &data->documents.documents[i]
-      : NULL;
+  Document *current_node = data->root_node;
+  ImGuiVideo_RenderNodes(current_node);
 
-    switch (current_item->element) {
-      case IMGUI_ELEMENT_E_NONE:
-        break;
-      case IMGUI_ELEMENT_E_TAB:
-        if (!tabs_active || i != next_tab_item) {
-          ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-          tabs_active = igBeginTabBar(current_item->title.chars, tab_bar_flags);
-        }
-        next_tab_item = i + 1;
-        if (tabs_active) {
-          ImGuiTabItemFlags tab_item_flags = ImGuiTabItemFlags_None;
-          // NOTE: second arg is used to add a "tab close" button
-          if (igBeginTabItem(current_item->title.chars, NULL, tab_item_flags)) {
-            igText(current_item->contents.chars);
-            igEndTabItem();
-          }
-        }
-
-        if (next_item == NULL) {
-          igEndTabBar();
-          break;
-        }
-        if (next_item->element != IMGUI_ELEMENT_E_TAB) {
-          igEndTabBar();
-        }
-        break;
-    }
-  }
 
   igEnd();
 
+}
+
+// NOTE: Consider pushing to an array vs pushing to the stack
+void ImGuiVideo_RenderNodes(Document *node) {
+
+  while (node) {
+    // Let element handle rendering children by calling `ImGuiVideo_RenderNodes()`
+    ImGuiVideo_RenderNode(node);
+    node = node->next;
+  }
+}
+
+void ImGuiVideo_RenderNode(Document *node) {
+  switch(node->element) {
+    case IMGUI_ELEMENT_E_NONE:
+      break;
+    case IMGUI_ELEMENT_E_TAB_BAR:
+      ImGuiVideo_RenderTabBar(node);
+      break;
+    case IMGUI_ELEMENT_E_TAB_ITEM:
+      ImGuiVideo_RenderTabItem(node);
+      break;
+  }
+}
+
+void ImGuiVideo_RenderTabBar(Document *node) {
+  ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+  if(igBeginTabBar(node->title.chars, tab_bar_flags)) {
+    if (node->child) {
+      ImGuiVideo_RenderNodes(node->child);
+    }
+    igEndTabBar();
+  };
+}
+
+void ImGuiVideo_RenderTabItem(Document *node) {
+  ImGuiTabItemFlags tab_item_flags = ImGuiTabItemFlags_None;
+  if (igBeginTabItem(node->title.chars, NULL, tab_item_flags)) {
+    // TODO: move igText to its own node
+    igText(node->contents.chars);
+    igEndTabItem();
+  }
 }
 
 void ImGuiVideo_ShowDemo(AppState *state) {
@@ -181,5 +238,45 @@ void ImGuiVideo_SampleWindow2(AppState *state) {
       state->show_another_window = false;
     }
     igEnd();
+  }
+}
+
+// WARN: broken function - keeping for now for legacy's sake
+void ImGuiVideo_RenderDocArray(ImGuiVideo_Data *data) {
+  bool tabs_active = false;
+  size_t next_tab_item = -1;
+
+  for (size_t i = 0; i < data->documents.length; i++) {
+    Document *current_item = &data->documents.documents[i];
+    Document *next_item = i + 1 < data->documents.length
+      ? &data->documents.documents[i]
+      : NULL;
+
+    // was a switch
+    if(IMGUI_ELEMENT_E_TAB_ITEM) {
+      if (!tabs_active || i != next_tab_item) {
+        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+        tabs_active = igBeginTabBar(current_item->title.chars, tab_bar_flags);
+      }
+      next_tab_item = i + 1;
+      if (tabs_active) {
+        ImGuiTabItemFlags tab_item_flags = ImGuiTabItemFlags_None;
+        // NOTE: second arg is used to add a "tab close" button
+        if (igBeginTabItem(current_item->title.chars, NULL, tab_item_flags)) {
+          igText(current_item->contents.chars);
+          igEndTabItem();
+        }
+      }
+
+      if (next_item == NULL) {
+        igEndTabBar();
+        break;
+      }
+      if (next_item->element != IMGUI_ELEMENT_E_TAB_ITEM) {
+        igEndTabBar();
+      }
+    }
+
+
   }
 }
