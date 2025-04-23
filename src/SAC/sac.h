@@ -8,6 +8,7 @@
 #include <key_commands.h>
 
 #include "SAC/renderers/renderer_SDL3.h"
+#include "SAC/shared-layouts/imgui_video.h"
 #include "SAC/time/time.h"
 #include "SAC/vulkan/setup.h"
 
@@ -33,6 +34,8 @@ typedef struct app_state {
   SDL_Window *window;
   SDL3RendererData rendererData;
   SDL_AppResult sdl_result;
+  GVulkan vulkan_globals;
+  ImGuiVideo_Data video_data;
   delta_time_s d_time;
   mouse_info_s mouse_info;
   sac_key_state_s key_state_s;
@@ -48,7 +51,6 @@ typedef struct app_state {
   bool show_demo;
   bool show_another_window;
   ImVec4 clear_color;
-  GVulkan vulkan_globals;
 } AppState;
 
 #endif

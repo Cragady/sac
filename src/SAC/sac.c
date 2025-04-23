@@ -1,6 +1,7 @@
 #ifndef SAC_SAC_C_ENTRY_POINT
 #define SAC_SAC_C_ENTRY_POINT
 
+#include "SAC/shared-layouts/imgui_video.h"
 #define SDL_MAIN_USE_CALLBACKS
 
 #include <stdio.h>
@@ -57,10 +58,6 @@ static inline Sac_Dimensions SDL_MeasureText(Sac_StringSlice text,
 
   return (Sac_Dimensions){(float)width, (float)height};
 }
-
-// void HandleClayErrors(Clay_ErrorData errorData) {
-//   printf("%s", errorData.errorText.chars);
-// }
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   (void)argc;
@@ -137,23 +134,18 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
 
   // Set up background color and demo window(s) state data
-  state->show_demo = true;
-  state->show_another_window = true;
+  state->show_demo = false;
+  state->show_another_window = false;
 
   state->clear_color.x = 0.45f;
   state->clear_color.y = 0.55f;
   state->clear_color.z = 0.60f;
   state->clear_color.w = 1.00f;
 
-  /* Initialize Clay */
-  // uint64_t totalMemorySize = Clay_MinMemorySize();
-  // Clay_Arena clayMemory = (Clay_Arena){.memory = SDL_malloc(totalMemorySize),
-  //                                      .capacity = totalMemorySize};
-
   int width, height;
   SDL_GetWindowSize(state->window, &width, &height);
 
-  // state->videoData = ClayVideo_Initialize();
+  state->video_data = ImGuiVideo_Initialize();
 
   *appstate = state;
 
@@ -182,20 +174,12 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     }
     break;
   case SDL_EVENT_WINDOW_RESIZED:
-    // Clay_SetLayoutDimensions((Clay_Dimensions){(float)event->window.data1,
-    //                                            (float)event->window.data2});
     break;
   case SDL_EVENT_MOUSE_MOTION:
-    // Clay_SetPointerState((Clay_Vector2){event->motion.x, event->motion.y},
-    //                      event->motion.state & SDL_BUTTON_LMASK);
     break;
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    // Clay_SetPointerState((Clay_Vector2){event->button.x, event->button.y},
-    //                      event->button.button == SDL_BUTTON_LEFT);
     break;
   case SDL_EVENT_MOUSE_WHEEL:
-    // Clay_UpdateScrollContainers(
-    //     true, (Clay_Vector2){event->wheel.x, event->wheel.y}, 0.01f);
     break;
   default:
     break;
@@ -223,20 +207,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   //   return state->sdl_result;
   // }
 
-  // TODO: see what is wanted or needed from below
-  // Clay_Context *missinapp_state.context = Clay_GetCurrentContext();
-  // ClayVideo_UpdateData(&state->videoData.documents, state);
-  // Clay_RenderCommandArray render_commands =
-  //     ClayVideo_CreateLayout(&state->videoData);
+  ImGuiVideo_UpdateData(&state->video_data.documents, state);
 
+  // TODO: see what is wanted or needed from below
   // SDL_SetRenderDrawColor(state->rendererData.renderer, 0, 0, 0, 255);
   // SDL_RenderClear(state->rendererData.renderer);
 
-  // SDL_Clay_RenderClayCommands(&state->rendererData, &render_commands);
-
   // SDL_RenderPresent(state->rendererData.renderer);
-
-
 
   // Resize swap chain?
   int fb_width, fb_height;
@@ -253,47 +230,11 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   ImGui_ImplSDL3_NewFrame();
   igNewFrame();
 
-  // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-  if (state->show_demo)
-    igShowDemoWindow(&state->show_demo);
+  ImGuiVideo_RenderDocuments(&state->video_data);
+  ImGuiVideo_ShowDemo(state);
+  ImGuiVideo_SampleWindow1(state);
+  ImGuiVideo_SampleWindow2(state);
 
-  // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-  {
-    static float f = 0.0f;
-    static int counter = 0;
-
-    igBegin("Hello, world!", NULL, 0);
-    igText("This is some useful text");
-    igCheckbox("Demo window", &state->show_demo);
-    igCheckbox("Another window", &state->show_another_window);
-
-    igSliderFloat("Float", &f, 0.0f, 1.0f, "%.3f", 0);
-    igColorEdit3("clear color", (float*)&state->clear_color, 0);
-
-    ImVec2 buttonSize;
-    buttonSize.x = 0;
-    buttonSize.y = 0;
-    if (igButton("Button", buttonSize))
-      counter++;
-    igSameLine(0.0f, -1.0f);
-    igText("counter = %d", counter);
-
-    igText("Application average %.3f ms/frame (%.1f FPS)",
-           1000.0f / igGetIO()->Framerate, igGetIO()->Framerate);
-    igEnd();
-  }
-
-  // 3. Show another simple window.
-  if (state->show_another_window) {
-   igBegin("imgui Another Window", &state->show_another_window, 0);
-   igText("Hello from imgui");
-   ImVec2 buttonSize;
-   buttonSize.x = 0; buttonSize.y = 0;
-   if (igButton("Close me", buttonSize)) {
-     state->show_another_window = false;
-   }
-   igEnd();
-  }
 
   // Rendering
   igRender();
