@@ -69,7 +69,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   // WARN: ?
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
       printf("Error: SDL_Init(): %s\n", SDL_GetError());
-      return -1;
+      return SDL_APP_FAILURE;
   }
 
   // From 2.0.18: Enable native IME.
@@ -152,9 +152,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   int width, height;
   SDL_GetWindowSize(state->window, &width, &height);
-  // Clay_Initialize(clayMemory, (Clay_Dimensions){(float)width, (float)height},
-  //                 (Clay_ErrorHandler){HandleClayErrors});
-  // Clay_SetMeasureTextFunction(SDL_MeasureText, state->rendererData.fonts);
 
   // state->videoData = ClayVideo_Initialize();
 
