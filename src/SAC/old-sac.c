@@ -22,8 +22,8 @@
 #include "SAC/renderers/clay_renderer_SDL3.h"
 // TODO: find way to not do next line
 #include "SAC/renderers/clay_renderer_SDL3.c"
-#include "SAC/shared-layouts/clay-video.h"
-#include "SAC/shared-layouts/clay-video.c"
+#include "SAC/shared_layouts/clay-video.h"
+#include "SAC/shared_layouts/clay-video.c"
 #include "SAC/time/time.h"
 
 // NOTE: start globals

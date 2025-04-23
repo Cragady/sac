@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #include "SAC/sac.h"
-#include "SAC/shared-layouts/clay-video.h"
+#include "SAC/shared_layouts/clay-video.h"
 
 #define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_FONT_ID_BODY_16 0
 #define SAC_SHARED_LAYOUTS_CLAY_VIDEO_C_COLOR_WHITE { 255, 255, 255, 255}

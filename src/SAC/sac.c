@@ -1,7 +1,6 @@
 #ifndef SAC_SAC_C_ENTRY_POINT
 #define SAC_SAC_C_ENTRY_POINT
 
-#include "SAC/shared-layouts/imgui_video.h"
 #define SDL_MAIN_USE_CALLBACKS
 
 #include <stdio.h>
@@ -34,6 +33,7 @@
 #include "SAC/output/output.h"
 #include "SAC/renderers/r_fonts.h"
 #include "SAC/renderers/r_imgui.h"
+#include "SAC/shared_layouts/imgui_video.h"
 #include "SAC/time/time.h"
 
 // NOTE: start globals

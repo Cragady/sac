@@ -11,7 +11,7 @@ set (SAC_SOURCES
   ${SAC_SOURCES_DIR}/output/output.c
   ${SAC_SOURCES_DIR}/renderers/r_fonts.c
   ${SAC_SOURCES_DIR}/renderers/r_imgui.c
-  ${SAC_SOURCES_DIR}/shared-layouts/imgui_video.c
+  ${SAC_SOURCES_DIR}/shared_layouts/imgui_video.c
   ${SAC_SOURCES_DIR}/time/time.c
   ${SAC_SOURCES_DIR}/vulkan/setup.c
 )
@@ -24,7 +24,7 @@ set (SAC_HEADERS
   ${SAC_SOURCES_DIR}/renderers/r_fonts.h
   ${SAC_SOURCES_DIR}/renderers/r_imgui.h
   ${SAC_SOURCES_DIR}/renderers/renderer_SDL3.h
-  ${SAC_SOURCES_DIR}/shared-layouts/imgui_video.h
+  ${SAC_SOURCES_DIR}/shared_layouts/imgui_video.h
   ${SAC_SOURCES_DIR}/time/time.h
   ${SAC_SOURCES_DIR}/vulkan/setup.h
 )
