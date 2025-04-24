@@ -21,12 +21,12 @@ int calc_delta_time(delta_time_s *dt) {
 }
 
 void handle_timers(AppState *state) {
-  state->stop_timer += state->d_time.delta_time;
-  state->cps_timer += state->d_time.delta_time;
-  state->input_timer -= state->d_time.delta_time;
+  state->auto_click_ctrl.stop_timer += state->d_time.delta_time;
+  state->auto_click_ctrl.cps_timer += state->d_time.delta_time;
+  state->auto_click_ctrl.input_timer -= state->d_time.delta_time;
 }
 
 void reset_input_timer(AppState *state, bool should_reset) {
   if (!should_reset) return;
-  state->input_timer = state->input_timer_target;
+  state->auto_click_ctrl.input_timer = state->auto_click_ctrl.input_timer_target;
 }

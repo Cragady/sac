@@ -85,11 +85,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   }
   *appstate = state;
 
-  // NOTE: we need extra init since calloc doesn't fit our needs in d_time
-  init_delta_time_s(&state->d_time);
-  state->cps_timer_target = CPS_TIMER_TARGET;
-  state->input_timer_target = INPUT_TIMER_TARGET;
-  state->click_batch_added_per_cycle = CLICK_BATCH_ADDED_PER_CYCLE;
+  loose_state_init(state);
 
   PopInitData(&state->vulkan_globals);
 
@@ -132,17 +128,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   // WARN: Image for some reason - currently unused
   // sample_image = IMG_Load("assets/sample.png");
-
-
-  // Set up background color and demo window(s) state data
-  state->show_sample_window = true;
-  state->show_demo = false;
-  state->show_another_window = false;
-
-  state->clear_color.x = 0.45f;
-  state->clear_color.y = 0.55f;
-  state->clear_color.z = 0.60f;
-  state->clear_color.w = 1.00f;
 
   int width, height;
   SDL_GetWindowSize(state->window, &width, &height);
@@ -232,7 +217,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   ImGui_ImplSDL3_NewFrame();
   igNewFrame();
 
-  ImGuiVideo_RenderDocuments(&state->video_data);
+  ImGuiVideo_RenderDocuments(&state->video_data, state);
   ImGuiVideo_ShowDemo(state);
   ImGuiVideo_SampleWindow1(state);
   ImGuiVideo_SampleWindow2(state);
@@ -309,6 +294,30 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   }
   TTF_Quit();
   SDL_Quit();
+}
+
+
+/* Loose State Init */
+void loose_state_init(AppState *state) {
+  // NOTE: we need extra init since calloc doesn't fit our needs in d_time
+  init_delta_time_s(&state->d_time);
+
+  // Click CTRL
+  state->initial_values.cps_timer_target = CPS_TIMER_TARGET;
+  state->initial_values.input_timer_target = INPUT_TIMER_TARGET;
+  state->initial_values.click_batch_added_per_cycle = CLICK_BATCH_ADDED_PER_CYCLE;
+  state->initial_values.max_click_speed = true;
+  state->auto_click_ctrl = state->initial_values;
+
+  // Set up background color and demo window(s) state data
+  state->show_sample_window = true;
+  state->show_demo = false;
+  state->show_another_window = false;
+
+  state->clear_color.x = 0.45f;
+  state->clear_color.y = 0.55f;
+  state->clear_color.z = 0.60f;
+  state->clear_color.w = 1.00f;
 }
 
 #endif

@@ -11,7 +11,7 @@ void handle_global_input(AppState *state) {
   // setting a bool on global state, nothing much more complicated than that
   check_app_should_close(&state->sdl_result);
   get_mouse_pos(&state->mouse_info);
-  if (state->input_timer > 0.0)
+  if (state->auto_click_ctrl.input_timer > 0.0)
     return;
   bool state_changed = global_click_spam_toggle(state);
   state_changed |= global_burst_click_spam(state);

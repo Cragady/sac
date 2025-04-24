@@ -39,6 +39,7 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
     memset((char *)status_str.chars, '\0', status_str.length);
   }
 
+  bool success = true;
   Document *root_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("ControlTabBar"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_BAR, .is_open = true, });
 
   // Setup the status/info node and its child
@@ -48,7 +49,13 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
 
   // Setup the settings node
   Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
-  ImGuiVideo_AddDocTextNode(settings_node, SAC_STRING("WIP"));
+  Document *settings_component_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Settings Component"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_COMPONENT, .component = IMGUI_COMPONENT_E_SETTINGS_TAB_CONTENT, .is_open = true, });
+  success = ImGuiVideo_AddDocNode(settings_node, settings_component_node, DOCUMENT_NODE_DIRECTION_E_CHILD);
+  if (!success) {
+    const char *err = "Failure in setting up doc node for settings_node";
+    printf("%s\n", err);
+    ImGuiVideo_AddDocTextNode(settings_node, SAC_STRING(err));
+  }
 
   // Setup the script node
   Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
@@ -57,7 +64,6 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
   // NOTE: add last siblings first (reverse order), then add that node as a child to parent
   // NOTE: allocation failures can be handled at this level; we don't need to worry
   // too much about `ImGuiVideo_AddDocTextNode` failures.
-  bool success = true;
   bool delete_info_node = false;
   success = ImGuiVideo_AddDocNode(settings_node, script_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
   if (!success) {
@@ -115,7 +121,10 @@ bool ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUME
 
   Document *new_node = malloc(sizeof(Document));
   if (new_node == NULL) {
-    printf("Error in allocating next!");
+    const char *alloc_node = direction == DOCUMENT_NODE_DIRECTION_E_NEXT
+      ? "next"
+      : "child";
+    printf("Error in allocating %s!\n", alloc_node);
     return false;
   }
 
@@ -186,7 +195,7 @@ void ImGuiVideo_UpdateStatusData(Document *status_node, AppState *state) {
   const int MOUSE_POS_X = state->mouse_info.x;
   const int MOUSE_POS_Y = state->mouse_info.y;
 
-  const char *clicking_t_f = state->should_click
+  const char *clicking_t_f = state->auto_click_ctrl.should_click
     ? "True"
     : "False";
 
@@ -201,11 +210,11 @@ void ImGuiVideo_UpdateStatusData(Document *status_node, AppState *state) {
   memset((char *)WANTED_STR + offset, '\0', STR_BUFF - offset);
 }
 
-void ImGuiVideo_RenderDocuments(ImGuiVideo_Data *data) {
+void ImGuiVideo_RenderDocuments(ImGuiVideo_Data *data, AppState *state) {
   igBegin("Hello, ImGuiVideo!", NULL, 0);
 
   Document *current_node = data->root_node;
-  ImGuiVideo_RenderNodes(current_node);
+  ImGuiVideo_RenderNodes(current_node, state);
 
 
   igEnd();
@@ -213,56 +222,93 @@ void ImGuiVideo_RenderDocuments(ImGuiVideo_Data *data) {
 }
 
 // NOTE: Consider pushing to an array vs pushing to the stack
-void ImGuiVideo_RenderNodes(Document *node) {
+void ImGuiVideo_RenderNodes(Document *node, AppState *state) {
 
   while (node) {
     // Let element handle rendering children by calling `ImGuiVideo_RenderNodes()`
-    ImGuiVideo_RenderNode(node);
+    ImGuiVideo_RenderNode(node, state);
     node = node->next;
   }
 }
 
-void ImGuiVideo_RenderNode(Document *node) {
+void ImGuiVideo_RenderNode(Document *node, AppState *state) {
   switch(node->element) {
     case IMGUI_ELEMENT_E_NONE:
       break;
     case IMGUI_ELEMENT_E_TAB_BAR:
-      ImGuiVideo_RenderTabBar(node);
+      ImGuiVideo_RenderTabBar(node, state);
       break;
     case IMGUI_ELEMENT_E_TAB_ITEM:
-      ImGuiVideo_RenderTabItem(node);
+      ImGuiVideo_RenderTabItem(node, state);
       break;
     case IMGUI_ELEMENT_E_TEXT:
-      ImGuiVideo_RenderText(node);
+      ImGuiVideo_RenderText(node, state);
+      break;
+    case IMGUI_ELEMENT_E_COMPONENT:
+      ImGuiVideo_RenderNodeComponent(node, state);
       break;
   }
 }
 
-void ImGuiVideo_RenderNodeChildren(Document *node) {
-  if (node->child) {
-    ImGuiVideo_RenderNodes(node->child);
+void ImGuiVideo_RenderNodeComponent(Document *node, AppState *state) {
+  switch(node->component) {
+    case IMGUI_COMPONENT_E_NONE:
+      break;
+    case IMGUI_COMPONENT_E_SETTINGS_TAB_CONTENT:
+      ImGuiVideo_SettingsTabContent(node, state);
+      break;
   }
 }
 
-void ImGuiVideo_RenderTabBar(Document *node) {
+void ImGuiVideo_RenderNodeChildren(Document *node, AppState *state) {
+  if (node->child) {
+    ImGuiVideo_RenderNodes(node->child, state);
+  }
+}
+
+void ImGuiVideo_RenderTabBar(Document *node, AppState *state) {
   ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
   if(igBeginTabBar(node->title.chars, tab_bar_flags)) {
-    ImGuiVideo_RenderNodeChildren(node);
+    ImGuiVideo_RenderNodeChildren(node, state);
     igEndTabBar();
   };
 }
 
-void ImGuiVideo_RenderTabItem(Document *node) {
+void ImGuiVideo_RenderTabItem(Document *node, AppState *state) {
   ImGuiTabItemFlags tab_item_flags = ImGuiTabItemFlags_None;
   if (igBeginTabItem(node->title.chars, NULL, tab_item_flags)) {
-    ImGuiVideo_RenderNodeChildren(node);
+    ImGuiVideo_RenderNodeChildren(node, state);
     igEndTabItem();
   }
 }
 
-void ImGuiVideo_RenderText(Document *node) {
+void ImGuiVideo_RenderText(Document *node, AppState *state) {
   igText(node->contents.chars);
 }
+
+// NOTE: below may not be possible with current data structures
+// void ImGuiVideo_RenderCheckbox(Document *node, bool *flag) {
+//   igCheckbox(node->contents.chars, flag);
+// }
+
+/* Begin Component Rendering */
+
+void ImGuiVideo_SettingsTabContent(Document *node, AppState *state) {
+  igSeparatorText("AutoClick CTRL");
+  igCheckbox("Max Clicks Possible", &state->auto_click_ctrl.max_click_speed);
+  // NOTE: from ImGui
+  // void SameLine(float offset_from_start_x = 0.0f, float spacing = -1.0f)
+  igSameLine(0.0f, -1.0f); ImGuiVideo_HelpMarker("With this enabled, the program will attempt to click as fast as possible. This setting is incompatible with other settings that relate to how fast the program will click.");
+
+  if (!state->auto_click_ctrl.max_click_speed) {
+    igText("Show Stuff Here");
+  }
+
+  igSeparatorText("MISC CTRL");
+  igCheckbox("Show Sample Window", &state->show_sample_window);
+}
+
+/**/
 
 void ImGuiVideo_ShowDemo(AppState *state) {
   // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -311,3 +357,17 @@ void ImGuiVideo_SampleWindow2(AppState *state) {
     igEnd();
   }
 }
+
+/* Util */
+// NOTE: This was lifted from imgui
+static void ImGuiVideo_HelpMarker(const char* desc) {
+    igTextDisabled("(?)");
+
+    if (igBeginItemTooltip()) {
+        igPushTextWrapPos(igGetFontSize() * 35.0f);
+        igTextUnformatted(desc, NULL);
+        igPopTextWrapPos();
+        igEndTooltip();
+    }
+}
+

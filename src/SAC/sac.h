@@ -12,6 +12,19 @@
 #include "SAC/time/time.h"
 #include "SAC/vulkan/setup.h"
 
+typedef struct {
+  bool should_click;
+  bool max_click_speed;
+  int click_batch_added_per_cycle;
+  int total_times_clicked;
+  float stop_timer_target;
+  double stop_timer;
+  double cps_timer_target;
+  double cps_timer;
+  double input_timer_target;
+  double input_timer;
+} AutoClickCtl;
+
 typedef struct GVulkan_s {
   VkAllocationCallbacks    *allocator;
   VkInstance               instance;
@@ -35,23 +48,18 @@ typedef struct app_state {
   SDL3RendererData rendererData;
   SDL_AppResult sdl_result;
   GVulkan vulkan_globals;
+  AutoClickCtl initial_values;
+  AutoClickCtl auto_click_ctrl;
   ImGuiVideo_Data video_data;
   delta_time_s d_time;
   mouse_info_s mouse_info;
   sac_key_state_s key_state_s;
-  int total_times_clicked;
-  float stop_timer_target;
-  double stop_timer;
-  double cps_timer_target;
-  double cps_timer;
-  double input_timer_target;
-  double input_timer;
-  bool should_click;
-  int click_batch_added_per_cycle;
   bool show_sample_window;
   bool show_demo;
   bool show_another_window;
   ImVec4 clear_color;
 } AppState;
+
+void loose_state_init(AppState *state);
 
 #endif

@@ -31,22 +31,22 @@ void check_app_should_close(SDL_AppResult *app_result) {
     *app_result = SDL_APP_SUCCESS;
 }
 
-bool global_click_spam_toggle(AppState *app_state) {
+bool global_click_spam_toggle(AppState *state) {
   bool chord_pressed =
       is_global_chord_pressed(KEY_NAMES_E_CAPITAL, KEY_NAMES_E_5);
-  bool old_state = app_state->should_click;
+  bool old_state = state->auto_click_ctrl.should_click;
   if (chord_pressed)
-    app_state->should_click = !app_state->should_click;
+    state->auto_click_ctrl.should_click = !state->auto_click_ctrl.should_click;
 
-  return old_state != app_state->should_click;
+  return old_state != state->auto_click_ctrl.should_click;
 }
 
 bool global_burst_click_spam(AppState *state) {
   bool chord_pressed =
       is_global_chord_pressed(KEY_NAMES_E_CAPITAL, KEY_NAMES_E_1);
-  bool old_state = state->should_click;
+  bool old_state = state->auto_click_ctrl.should_click;
   if (chord_pressed)
     l_click_mouse_with_arr(state->mouse_info.x, state->mouse_info.y);
 
-  return old_state != state->should_click;
+  return old_state != state->auto_click_ctrl.should_click;
 }

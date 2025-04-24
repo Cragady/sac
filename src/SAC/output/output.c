@@ -3,15 +3,15 @@
 #include "SAC/output/output.h"
 
 void handle_output_clicking(AppState *state) {
-  if (!state->should_click) return;
-  if (state->cps_timer < (double)state->cps_timer_target) return;
+  if (!state->auto_click_ctrl.should_click) return;
+  if (state->auto_click_ctrl.cps_timer < (double)state->auto_click_ctrl.cps_timer_target) return;
   int mouse_x = state->mouse_info.x;
   int mouse_y = state->mouse_info.y;
 
-  l_click_mouse(mouse_x, mouse_y, state->click_batch_added_per_cycle);
+  l_click_mouse(mouse_x, mouse_y, state->auto_click_ctrl.click_batch_added_per_cycle);
 
-  state->cps_timer = 0;
-  state->total_times_clicked++;
+  state->auto_click_ctrl.cps_timer = 0;
+  state->auto_click_ctrl.total_times_clicked++;
 }
 
 

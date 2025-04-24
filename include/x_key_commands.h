@@ -20,7 +20,7 @@ typedef enum KEY_NAMES_ET_ {
 bool is_global_chord_pressed(KEY_NAMES_E_, KEY_NAMES_E_);
 bool is_global_prog_escape_req();
 void check_app_should_close(SDL_AppResult *app_result);
-bool global_click_spam_toggle(AppState *app_state);
+bool global_click_spam_toggle(AppState *state);
 bool global_burst_click_spam(AppState *state);
 
 #endif
