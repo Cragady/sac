@@ -33,7 +33,6 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 file(COPY "${CMAKE_SOURCE_DIR}/assets" DESTINATION "${BUILD_OUTPUT}")
 
 include(vulkanImport)
-include(clayImport)
 include(SDLImport)
 include(SDL_imageImport)
 include(SDL_ttfImport)
