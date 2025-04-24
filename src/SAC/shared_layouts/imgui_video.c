@@ -298,7 +298,7 @@ void ImGuiVideo_SettingsTabContent(Document *node, AppState *state) {
   igCheckbox("Max Clicks Possible", &state->auto_click_ctrl.max_click_speed);
   // NOTE: from ImGui
   // void SameLine(float offset_from_start_x = 0.0f, float spacing = -1.0f)
-  igSameLine(0.0f, -1.0f); ImGuiVideo_HelpMarker("With this enabled, the program will attempt to click as fast as possible. This setting is incompatible with other settings that relate to how fast the program will click.");
+  igSameLine(0.0f, -1.0f); ImGuiVideo_HelpMarker("With this enabled, the program will attempt to click as fast as possible. This setting is incompatible with other settings that relate to how fast the program will click.\n\nThis will also build up a \"click queue\" so use this setting with caution.");
 
   if (!state->auto_click_ctrl.max_click_speed) {
     igText("Show Stuff Here");
