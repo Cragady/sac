@@ -135,6 +135,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
 
   // Set up background color and demo window(s) state data
+  state->show_sample_window = true;
   state->show_demo = false;
   state->show_another_window = false;
 

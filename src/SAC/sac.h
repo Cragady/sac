@@ -48,6 +48,7 @@ typedef struct app_state {
   double input_timer;
   bool should_click;
   int click_batch_added_per_cycle;
+  bool show_sample_window;
   bool show_demo;
   bool show_another_window;
   ImVec4 clear_color;

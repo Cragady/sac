@@ -271,12 +271,14 @@ void ImGuiVideo_ShowDemo(AppState *state) {
 }
 
 void ImGuiVideo_SampleWindow1(AppState *state) {
+  if (!state->show_sample_window) return;
   // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
   static float f = 0.0f;
   static int counter = 0;
 
   igBegin("Hello, world!", NULL, 0);
   igText("This is some useful text");
+  igCheckbox("Show this window", &state->show_sample_window);
   igCheckbox("Demo window", &state->show_demo);
   igCheckbox("Another window", &state->show_another_window);
 
