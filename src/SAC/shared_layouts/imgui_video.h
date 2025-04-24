@@ -64,8 +64,6 @@ void ImGuiVideo_UpdateStatusData(Document *status_node, AppState *state);
 
 /* Doc Rendering */
 void ImGuiVideo_RenderDocuments(ImGuiVideo_Data *data);
-// WARN: broken function - keeping for now for legacy's sake
-void ImGuiVideo_RenderDocArray(ImGuiVideo_Data *data);
 
 /* Node Rendering */
 // NOTE: Consider pushing to an array vs pushing to the stack
@@ -85,5 +83,9 @@ void ImGuiVideo_RenderText(Document *node);
 void ImGuiVideo_ShowDemo(AppState *state);
 void ImGuiVideo_SampleWindow1(AppState *state);
 void ImGuiVideo_SampleWindow2(AppState *state);
+
+/* Old Doc Rendering */
+// WARN: broken function - keeping for now for legacy's sake
+void ImGuiVideo_RenderDocArray(ImGuiVideo_Data *data);
 
 #endif

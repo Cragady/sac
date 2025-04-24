@@ -13,60 +13,6 @@
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR "FAILED STR ALLOC IN IMGUI_STRING"
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_STATUS_STR_ERR_BUFF 31
 
-Document *ImGuiVideo_CreateDocNode(Document *doc) {
-  doc->next = NULL;
-  doc->child = NULL;
-  return doc;
-}
-
-int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
-  if (doc_array->length == doc_array->max_length) return 1;
-  doc_array->documents[doc_array->length] = document;
-  doc_array->length++;
-  return 0;
-}
-
-int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
-
-  Document *new_node = malloc(sizeof(Document));
-  if (new_node == NULL) {
-    printf("Error in allocating next!");
-    return -1;
-  }
-
-  *new_node = *linked_node;
-
-  switch (direction) {
-    case DOCUMENT_NODE_DIRECTION_E_NEXT:
-      current_node->next = new_node;
-      break;
-    case DOCUMENT_NODE_DIRECTION_E_CHILD:
-      current_node->child = new_node;
-      break;
-  }
-
-  return 0;
-}
-
-int ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text) {
-  Document text_doc = {
-    .title = SAC_STRING(""),
-    .contents = text,
-    .element = IMGUI_ELEMENT_E_TEXT,
-    .is_open = true,
-    .next = NULL,
-    .child = NULL,
-  };
-
-  int failure = ImGuiVideo_AddDocNode(current_node, &text_doc, DOCUMENT_NODE_DIRECTION_E_CHILD);
-
-  if (failure) {
-    return failure;
-  }
-
-  return 0;
-}
-
 ImGuiVideo_Data ImGuiVideo_Initialize() {
   const size_t DOC_LEN = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_DOCS_LEN;
   ImGuiVideo_Data data = {
@@ -132,6 +78,60 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
 
   printf("SETUP: ImGuiVideo_Initialize() Finished\n");
   return data;
+}
+
+Document *ImGuiVideo_CreateDocNode(Document *doc) {
+  doc->next = NULL;
+  doc->child = NULL;
+  return doc;
+}
+
+int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
+  if (doc_array->length == doc_array->max_length) return 1;
+  doc_array->documents[doc_array->length] = document;
+  doc_array->length++;
+  return 0;
+}
+
+int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
+
+  Document *new_node = malloc(sizeof(Document));
+  if (new_node == NULL) {
+    printf("Error in allocating next!");
+    return -1;
+  }
+
+  *new_node = *linked_node;
+
+  switch (direction) {
+    case DOCUMENT_NODE_DIRECTION_E_NEXT:
+      current_node->next = new_node;
+      break;
+    case DOCUMENT_NODE_DIRECTION_E_CHILD:
+      current_node->child = new_node;
+      break;
+  }
+
+  return 0;
+}
+
+int ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text) {
+  Document text_doc = {
+    .title = SAC_STRING(""),
+    .contents = text,
+    .element = IMGUI_ELEMENT_E_TEXT,
+    .is_open = true,
+    .next = NULL,
+    .child = NULL,
+  };
+
+  int failure = ImGuiVideo_AddDocNode(current_node, &text_doc, DOCUMENT_NODE_DIRECTION_E_CHILD);
+
+  if (failure) {
+    return failure;
+  }
+
+  return 0;
 }
 
 void ImGuiVideo_UpdateData(Document *status_node, AppState *state) {
