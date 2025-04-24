@@ -7,9 +7,6 @@
 [submodule "vendor/SDL_image"]
 	path = vendor/SDL_image
 	url = git@github.com:libsdl-org/SDL_image.git
-[submodule "vendor/clay"]
-	path = vendor/clay
-	url = git@github.com:nicbarker/clay.git
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = git@github.com:glfw/glfw
