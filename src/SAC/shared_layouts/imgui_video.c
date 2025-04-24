@@ -48,6 +48,25 @@ int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMEN
   return 0;
 }
 
+int ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text) {
+  Document text_doc = {
+    .title = SAC_STRING(""),
+    .contents = text,
+    .element = IMGUI_ELEMENT_E_TEXT,
+    .is_open = true,
+    .next = NULL,
+    .child = NULL,
+  };
+
+  int failure = ImGuiVideo_AddDocNode(current_node, &text_doc, DOCUMENT_NODE_DIRECTION_E_CHILD);
+
+  if (failure) {
+    return failure;
+  }
+
+  return 0;
+}
+
 ImGuiVideo_Data ImGuiVideo_Initialize() {
   const size_t DOC_LEN = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_DOCS_LEN;
   ImGuiVideo_Data data = {
@@ -86,12 +105,20 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
     memset((char *)status_str.chars, '\0', status_str.length);
   }
 
-  // ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("Status"), .contents = status_str, .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
-  // ImGuiVideo_AddDocument(documents, (Document){ .title = SAC_STRING("WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB, .is_open = true, });
   Document *root_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("ControlTabBar"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_BAR, .is_open = true, });
-  Document *info_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Status"), .contents = status_str, .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
-  Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
-  Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING("WIP"), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+
+  // Setup the status/info node and its child
+  Document *info_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Status"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  ImGuiVideo_AddDocTextNode(info_node, status_str);
+  Document *status_node = info_node->child;
+
+  // Setup the settings node
+  Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  ImGuiVideo_AddDocTextNode(settings_node, SAC_STRING("WIP"));
+
+  // Setup the script node
+  Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  ImGuiVideo_AddDocTextNode(script_node, SAC_STRING("WIP"));
 
   // NOTE: add last siblings first (reverse order), then add that node as a child to parent
   // TODO: actually check if adding node was successful
@@ -101,8 +128,9 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
   ImGuiVideo_AddDocNode(root_node, info_node, DOCUMENT_NODE_DIRECTION_E_CHILD);
 
   *data.root_node = *root_node;
-  *data.status_node = *info_node;
+  *data.status_node = *status_node;
 
+  printf("SETUP: ImGuiVideo_Initialize() Finished\n");
   return data;
 }
 
@@ -173,15 +201,22 @@ void ImGuiVideo_RenderNode(Document *node) {
     case IMGUI_ELEMENT_E_TAB_ITEM:
       ImGuiVideo_RenderTabItem(node);
       break;
+    case IMGUI_ELEMENT_E_TEXT:
+      ImGuiVideo_RenderText(node);
+      break;
+  }
+}
+
+void ImGuiVideo_RenderNodeChildren(Document *node) {
+  if (node->child) {
+    ImGuiVideo_RenderNodes(node->child);
   }
 }
 
 void ImGuiVideo_RenderTabBar(Document *node) {
   ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
   if(igBeginTabBar(node->title.chars, tab_bar_flags)) {
-    if (node->child) {
-      ImGuiVideo_RenderNodes(node->child);
-    }
+    ImGuiVideo_RenderNodeChildren(node);
     igEndTabBar();
   };
 }
@@ -189,10 +224,13 @@ void ImGuiVideo_RenderTabBar(Document *node) {
 void ImGuiVideo_RenderTabItem(Document *node) {
   ImGuiTabItemFlags tab_item_flags = ImGuiTabItemFlags_None;
   if (igBeginTabItem(node->title.chars, NULL, tab_item_flags)) {
-    // TODO: move igText to its own node
-    igText(node->contents.chars);
+    ImGuiVideo_RenderNodeChildren(node);
     igEndTabItem();
   }
+}
+
+void ImGuiVideo_RenderText(Document *node) {
+  igText(node->contents.chars);
 }
 
 void ImGuiVideo_ShowDemo(AppState *state) {
