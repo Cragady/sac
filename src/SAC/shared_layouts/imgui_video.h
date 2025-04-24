@@ -26,6 +26,7 @@ typedef struct document_s {
   Sac_String contents;
   IMGUI_ELEMENT_E_ element;
   bool is_open;
+  bool is_heap;
   Document *next;
   Document *child;
 } Document;
@@ -38,11 +39,14 @@ typedef struct {
 
 typedef struct {
   int32_t selected_document_index;
-  DocumentArray documents;
   Document *root_node; // for linked-list parsing instead of array
   Document *status_node;
   int allocation_failure;
 } ImGuiVideo_Data;
+
+typedef struct {
+  DocumentArray documents;
+} ImGuiVideo_OldData;
 
 typedef struct {
   int32_t requested_document_index;
@@ -54,9 +58,16 @@ ImGuiVideo_Data ImGuiVideo_Initialize();
 
 /* Doc & Node Creation */
 Document *ImGuiVideo_CreateDocNode(Document *doc);
-int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document);
-int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction);
-int ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text);
+// Returns true on success
+bool ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document);
+// Returns true on success
+bool ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction);
+// Returns true on success
+bool ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text);
+
+/* Doc & Node Deletion */
+void ImGuiVideo_DeleteDocNode(Document *doc);
+void ImGuiVideo_DeleteDocNodeTree(Document *doc);
 
 /* Lifetime */
 void ImGuiVideo_UpdateData(Document *status_node, AppState *state);
@@ -86,6 +97,6 @@ void ImGuiVideo_SampleWindow2(AppState *state);
 
 /* Old Doc Rendering */
 // WARN: broken function - keeping for now for legacy's sake
-void ImGuiVideo_RenderDocArray(ImGuiVideo_Data *data);
+void ImGuiVideo_RenderDocArray(ImGuiVideo_OldData *data);
 
 #endif

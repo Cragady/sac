@@ -2,8 +2,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <common.h>
+
 #include "SAC/sac.h"
-#include "cimgui.h"
 #include "SAC/shared_layouts/imgui_video.h"
 
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_FONT_ID_BODY_16 0
@@ -16,23 +17,10 @@
 ImGuiVideo_Data ImGuiVideo_Initialize() {
   const size_t DOC_LEN = SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_DOCS_LEN;
   ImGuiVideo_Data data = {
-    .documents = {
-      .max_length = DOC_LEN,
-      .length = 0,
-      // .documents = malloc(sizeof(Document) * DOC_LEN),
-      .documents = NULL,
-    },
     .root_node = malloc(sizeof(Document)),
     .status_node = malloc(sizeof(Document)),
     .allocation_failure = false,
   };
-
-  // DocumentArray *documents = &data.documents;
-
-  // if (documents->documents == NULL) {
-  //   data.allocation_failure = true;
-  //   return data;
-  // }
 
   if (data.root_node == NULL || data.status_node == NULL) {
     if (data.root_node) free(data.root_node);
@@ -51,30 +39,60 @@ ImGuiVideo_Data ImGuiVideo_Initialize() {
     memset((char *)status_str.chars, '\0', status_str.length);
   }
 
-  Document *root_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("ControlTabBar"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_BAR, .is_open = true, });
+  Document *root_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("ControlTabBar"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_BAR, .is_open = true, });
 
   // Setup the status/info node and its child
-  Document *info_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Status"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  Document *info_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Status"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
   ImGuiVideo_AddDocTextNode(info_node, status_str);
   Document *status_node = info_node->child;
 
   // Setup the settings node
-  Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  Document *settings_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Settings - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
   ImGuiVideo_AddDocTextNode(settings_node, SAC_STRING("WIP"));
 
   // Setup the script node
-  Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
+  Document *script_node = ImGuiVideo_CreateDocNode(&(Document){ .is_heap = false, .title = SAC_STRING("Script - WIP"), .contents = SAC_STRING(""), .element = IMGUI_ELEMENT_E_TAB_ITEM, .is_open = true, });
   ImGuiVideo_AddDocTextNode(script_node, SAC_STRING("WIP"));
 
   // NOTE: add last siblings first (reverse order), then add that node as a child to parent
-  // TODO: actually check if adding node was successful
-  // TODO: handle allocation failures
-  ImGuiVideo_AddDocNode(settings_node, script_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
-  ImGuiVideo_AddDocNode(info_node, settings_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
-  ImGuiVideo_AddDocNode(root_node, info_node, DOCUMENT_NODE_DIRECTION_E_CHILD);
+  // NOTE: allocation failures can be handled at this level; we don't need to worry
+  // too much about `ImGuiVideo_AddDocTextNode` failures.
+  bool success = true;
+  bool delete_info_node = false;
+  success = ImGuiVideo_AddDocNode(settings_node, script_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
+  if (!success) {
+    printf("FAILURE: add doc node, script_node to settings_node\n");
+    ImGuiVideo_DeleteDocNode(script_node);
+    settings_node->next = NULL;
+  }
+
+  success = ImGuiVideo_AddDocNode(info_node, settings_node, DOCUMENT_NODE_DIRECTION_E_NEXT);
+  if (!success){
+    printf("FAILURE: add doc node, settings_node to info_node\n");
+    ImGuiVideo_DeleteDocNode(settings_node);
+    info_node->next = NULL;
+  }
+
+  success = ImGuiVideo_AddDocNode(root_node, info_node, DOCUMENT_NODE_DIRECTION_E_CHILD);
+  if (!success) {
+    printf("FAILURE: add doc node, info_node to root_node\n");
+    delete_info_node = true;
+    root_node->child = NULL;
+  }
 
   *data.root_node = *root_node;
-  *data.status_node = *status_node;
+  data.root_node->is_heap = true;
+
+  if (delete_info_node) {
+    printf("FAILURE STATUS: cleaning up status_node\n");
+    // NOTE: since status_node is part of the node tree, we let the tree clean
+    // itself up.
+    ImGuiVideo_DeleteDocNode(info_node);
+    data.status_node = NULL;
+    data.root_node->child = NULL;
+  } else {
+    *data.status_node = *status_node;
+  }
 
   printf("SETUP: ImGuiVideo_Initialize() Finished\n");
   return data;
@@ -86,22 +104,23 @@ Document *ImGuiVideo_CreateDocNode(Document *doc) {
   return doc;
 }
 
-int ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
-  if (doc_array->length == doc_array->max_length) return 1;
+bool ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
+  if (doc_array->length == doc_array->max_length) return false;
   doc_array->documents[doc_array->length] = document;
   doc_array->length++;
-  return 0;
+  return true;
 }
 
-int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
+bool ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
 
   Document *new_node = malloc(sizeof(Document));
   if (new_node == NULL) {
     printf("Error in allocating next!");
-    return -1;
+    return false;
   }
 
   *new_node = *linked_node;
+  new_node->is_heap = true;
 
   switch (direction) {
     case DOCUMENT_NODE_DIRECTION_E_NEXT:
@@ -112,30 +131,42 @@ int ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMEN
       break;
   }
 
-  return 0;
+  return true;
 }
 
-int ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text) {
+bool ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text) {
   Document text_doc = {
     .title = SAC_STRING(""),
     .contents = text,
     .element = IMGUI_ELEMENT_E_TEXT,
     .is_open = true,
+    .is_heap = false,
     .next = NULL,
     .child = NULL,
   };
 
-  int failure = ImGuiVideo_AddDocNode(current_node, &text_doc, DOCUMENT_NODE_DIRECTION_E_CHILD);
+  return ImGuiVideo_AddDocNode(current_node, &text_doc, DOCUMENT_NODE_DIRECTION_E_CHILD);
+}
 
-  if (failure) {
-    return failure;
+void ImGuiVideo_DeleteDocNode(Document *doc) {
+  while (doc) {
+    if (doc->child) {
+      ImGuiVideo_DeleteDocNode(doc->child);
+    }
+    free_sac_string(&doc->title);
+    free_sac_string(&doc->contents);
+    Document *next = doc->next;
+    if (doc->is_heap) {
+      free(doc);
+    } else {
+      doc = NULL;
+    }
+    doc = next;
   }
-
-  return 0;
 }
 
 void ImGuiVideo_UpdateData(Document *status_node, AppState *state) {
-  ImGuiVideo_UpdateStatusData(status_node, state);
+  if (status_node) ImGuiVideo_UpdateStatusData(status_node, state);
 }
 
 // TODO: review logic in this function
@@ -280,7 +311,7 @@ void ImGuiVideo_SampleWindow2(AppState *state) {
 }
 
 // WARN: broken function - keeping for now for legacy's sake
-void ImGuiVideo_RenderDocArray(ImGuiVideo_Data *data) {
+void ImGuiVideo_RenderDocArray(ImGuiVideo_OldData *data) {
   bool tabs_active = false;
   size_t next_tab_item = -1;
 

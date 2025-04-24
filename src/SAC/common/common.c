@@ -50,6 +50,13 @@ Sac_String alloc_sac_string(const char *new_str, size_t n) {
   return str;
 }
 
+void free_sac_string(Sac_String *str) {
+  if (!str->is_statically_allocated) {
+    if (str->chars) free((char *)str->chars);
+    str->chars = NULL;
+  }
+}
+
 char *sac_strncpy(char *dest, const char *target, size_t n) {
   if (n == 0) return dest;
   strncpy(dest, target, n);

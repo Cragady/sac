@@ -36,5 +36,6 @@ Sac_String new_sac_string(const char *new_str, size_t n);
 Sac_String default_new_sac_string(const char *new_str);
 char *sac_strncpy(char *dest, const char *target, size_t n);
 Sac_String alloc_sac_string(const char *new_str, size_t n);
+void free_sac_string(Sac_String *str);
 
 #endif
