@@ -45,10 +45,6 @@ typedef struct {
 } ImGuiVideo_Data;
 
 typedef struct {
-  DocumentArray documents;
-} ImGuiVideo_OldData;
-
-typedef struct {
   int32_t requested_document_index;
   int32_t *selected_document_index;
 } SidebarClickData;
@@ -94,9 +90,5 @@ void ImGuiVideo_RenderText(Document *node);
 void ImGuiVideo_ShowDemo(AppState *state);
 void ImGuiVideo_SampleWindow1(AppState *state);
 void ImGuiVideo_SampleWindow2(AppState *state);
-
-/* Old Doc Rendering */
-// WARN: broken function - keeping for now for legacy's sake
-void ImGuiVideo_RenderDocArray(ImGuiVideo_OldData *data);
 
 #endif
