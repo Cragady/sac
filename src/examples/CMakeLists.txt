@@ -9,3 +9,12 @@ set_target_properties(sdl3_vulkan_cimgui_example PROPERTIES
 )
 
 # target_compile_options(sdl3_vulkan_cimgui_example PRIVATE "-g")
+
+project(sdl3_ttf_example)
+
+add_executable(sdl3_ttf_example sdl3_ttf_example.c)
+target_link_libraries(sdl3_ttf_example PUBLIC SDL3_ttf::SDL3_ttf SDL3::SDL3)
+
+set_target_properties(sdl3_ttf_example PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${BUILD_OUTPUT}/bin"
+)
