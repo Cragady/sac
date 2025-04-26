@@ -64,8 +64,6 @@ ImGuiVideo_Data ImGuiVideo_Initialize();
 /* Doc & Node Creation */
 Document *ImGuiVideo_CreateDocNode(Document *doc);
 // Returns true on success
-bool ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document);
-// Returns true on success
 bool ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction);
 // Returns true on success
 bool ImGuiVideo_AddDocTextNode(Document *current_node, Sac_String text);

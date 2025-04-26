@@ -110,13 +110,6 @@ Document *ImGuiVideo_CreateDocNode(Document *doc) {
   return doc;
 }
 
-bool ImGuiVideo_AddDocument(DocumentArray *doc_array, Document document) {
-  if (doc_array->length == doc_array->max_length) return false;
-  doc_array->documents[doc_array->length] = document;
-  doc_array->length++;
-  return true;
-}
-
 bool ImGuiVideo_AddDocNode(Document *current_node, Document *linked_node, DOCUMENT_NODE_DIRECTION_E_ direction) {
 
   Document *new_node = malloc(sizeof(Document));
