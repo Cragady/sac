@@ -117,3 +117,7 @@ If the clicker is being ran for a bit, the click queue seems to build up and sto
 ### Questionable Clicks Measuring Methodology
 
 I'm having to use GUI based programs to capture clicks. This in and of itself will introduce some inaccuracy in collecting the amount of clicks the program is actually initiating. I can use the program itself to give an *estimated* amount of clicks, but that's like asking a government agency to audit itself for any wrongdoing. Unreliable at best, and straight up fantasy land reporting at worst.
+
+### Questionable Clicks Per Second Setting
+
+The clicks per second aren't exactly where they should be.

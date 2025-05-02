@@ -14,7 +14,7 @@ void loose_state_init(AppState *state) {
   state->auto_click_ctrl = state->initial_values;
 
   // Set up background color and demo window(s) state data
-  state->show_sample_window = true;
+  state->show_sample_window = false;
   state->show_demo = false;
   state->show_another_window = false;
 
