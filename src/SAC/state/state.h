@@ -1,5 +1,5 @@
-#ifndef SAC_SAC_H_
-#define SAC_SAC_H_
+#ifndef SAC_STATE_STATE_H_
+#define SAC_STATE_STATE_H_
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -12,6 +12,12 @@
 #include "SAC/time/time.h"
 #include "SAC/vulkan/setup.h"
 
+
+#define SAC_STATE_STATE_CPS_TIMER_TARGET 1.0 / 500
+#define SAC_STATE_STATE_INPUT_TIMER_TARGET 0.250
+#define SAC_STATE_STATE_CLICK_BATCH_ADDED_PER_CYCLE 5
+#define SAC_STATE_STATE_CLICKS_PER_SECOND 50
+
 typedef struct {
   bool should_click;
   bool max_click_speed;
@@ -23,6 +29,7 @@ typedef struct {
   double cps_timer;
   double input_timer_target;
   double input_timer;
+  double clicks_per_second;
 } AutoClickCtl;
 
 typedef struct GVulkan_s {
@@ -60,6 +67,10 @@ typedef struct app_state {
   ImVec4 clear_color;
 } AppState;
 
+
+
 void loose_state_init(AppState *state);
+void calc_clicks_per_second(AppState *state, size_t old_clicks);
+void set_clicks_per_second_to_max(AppState *state);
 
 #endif

@@ -3,8 +3,8 @@
 #include <x_key_commands.h>
 
 #include "SAC/input/input.h"
+#include "SAC/state/state.h"
 #include "SAC/time/time.h"
-#include "SAC/sac.h"
 
 void handle_global_input(AppState *state) {
   // NOTE: we don't need to gate-keep check_app_should_close because it's just

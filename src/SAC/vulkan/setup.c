@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "SAC/sac.h"
+#include "SAC/state/state.h"
 #include "SAC/vulkan/setup.h"
 
 int SetupVulkanWrapper(AppState *state) {

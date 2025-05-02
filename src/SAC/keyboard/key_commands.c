@@ -1,7 +1,8 @@
-#include "SAC/sac.h"
 #include <mouse_commands.h>
 #include <key_commands.h>
 #include <x_key_commands.h>
+
+#include "SAC/state/state.h"
 
 bool is_global_chord_pressed(KEY_NAMES_E_ first_key, KEY_NAMES_E_ second_key) {
   const int CONTROL_KEY = convert_common_key_name_for_api(first_key);

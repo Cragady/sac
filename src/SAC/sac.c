@@ -27,19 +27,16 @@
 #include "SAC/shared_includes/loc_cimgui.h"
 #include "SAC/vulkan/setup.h"
 
-#include "SAC/sac.h"
 #include "SAC/cglm/misc.h"
 #include "SAC/input/input.h"
 #include "SAC/output/output.h"
 #include "SAC/renderers/r_fonts.h"
 #include "SAC/renderers/r_imgui.h"
 #include "SAC/shared_layouts/imgui_video.h"
+#include "SAC/state/state.h"
 #include "SAC/time/time.h"
 
 // NOTE: start globals
-static const double CPS_TIMER_TARGET = 1.0 / 500;
-static const double INPUT_TIMER_TARGET = 0.250;
-static const int CLICK_BATCH_ADDED_PER_CYCLE = 5;
 // SDL_Surface *sample_image;
 // NOTE: end globals
 
@@ -294,30 +291,6 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   }
   TTF_Quit();
   SDL_Quit();
-}
-
-
-/* Loose State Init */
-void loose_state_init(AppState *state) {
-  // NOTE: we need extra init since calloc doesn't fit our needs in d_time
-  init_delta_time_s(&state->d_time);
-
-  // Click CTRL
-  state->initial_values.cps_timer_target = CPS_TIMER_TARGET;
-  state->initial_values.input_timer_target = INPUT_TIMER_TARGET;
-  state->initial_values.click_batch_added_per_cycle = CLICK_BATCH_ADDED_PER_CYCLE;
-  state->initial_values.max_click_speed = true;
-  state->auto_click_ctrl = state->initial_values;
-
-  // Set up background color and demo window(s) state data
-  state->show_sample_window = true;
-  state->show_demo = false;
-  state->show_another_window = false;
-
-  state->clear_color.x = 0.45f;
-  state->clear_color.y = 0.55f;
-  state->clear_color.z = 0.60f;
-  state->clear_color.w = 1.00f;
 }
 
 #endif

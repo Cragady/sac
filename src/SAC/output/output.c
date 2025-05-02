@@ -1,6 +1,6 @@
-#include "SAC/sac.h"
 #include "mouse_commands.h"
 #include "SAC/output/output.h"
+#include "SAC/state/state.h"
 
 void handle_output_clicking(AppState *state) {
   if (!state->auto_click_ctrl.should_click) return;

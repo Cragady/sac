@@ -1,11 +1,14 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include <common.h>
 
-#include "SAC/sac.h"
+#include "SAC/shared_includes/loc_cimgui.h"
 #include "SAC/shared_layouts/imgui_video.h"
+#include "SAC/state/state.h"
+#include "cimgui.h"
 
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_FONT_ID_BODY_16 0
 #define SAC_SHARED_LAYOUTS_IMGUI_VIDEO_C_COLOR_WHITE { 255, 255, 255, 255}
@@ -294,7 +297,15 @@ void ImGuiVideo_SettingsTabContent(Document *node, AppState *state) {
   igSameLine(0.0f, -1.0f); ImGuiVideo_HelpMarker("With this enabled, the program will attempt to click as fast as possible. This setting is incompatible with other settings that relate to how fast the program will click.\n\nThis will also build up a \"click queue\" so use this setting with caution.");
 
   if (!state->auto_click_ctrl.max_click_speed) {
+    double old_clicks = state->auto_click_ctrl.clicks_per_second;
+
+    igInputDouble("Clicks Per Second", &state->auto_click_ctrl.clicks_per_second, 1, 5, "%f", ImGuiInputTextFlags_None);
+
+    calc_clicks_per_second(state, old_clicks);
+
     igText("Show Stuff Here");
+  } else {
+    set_clicks_per_second_to_max(state);
   }
 
   igSeparatorText("MISC CTRL");
