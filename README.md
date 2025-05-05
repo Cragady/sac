@@ -54,7 +54,7 @@ There may be other dependencies, but I don't want to track that right now.
 
 ```sh
 # Cloning
-git clone git@github.com:Cragady/sac.git --recurse-submodules --depth 2 -j8
+git clone git@github.com:Cragady/sac.git --recurse-submodules -j8
 ```
 
 ```sh
