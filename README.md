@@ -118,6 +118,16 @@ If the clicker is being ran for a bit, the click queue seems to build up and sto
 
 I'm having to use GUI based programs to capture clicks. This in and of itself will introduce some inaccuracy in collecting the amount of clicks the program is actually initiating. I can use the program itself to give an *estimated* amount of clicks, but that's like asking a government agency to audit itself for any wrongdoing. Unreliable at best, and straight up fantasy land reporting at worst.
 
-### Questionable Clicks Per Second Setting
+### Clicks Per Second not Hitting Target
 
-The clicks per second aren't exactly where they should be.
+The rendering of the GUI is preventing accurate time for sending clicks. This can be resolved by buffering multiple clicks in one command by multiplying wanted clicks by delta_time and flooring the value and keeping track of click loss and adding the lost clicks appropriately.
+
+An alternative solution is to not multiply clicks per second, and just calculate click loss and add the loss of clicks as soon as it's greater than 1.
+
+## Solved / Innacurate Issues
+
+### ~Questionable Clicks Per Second Setting~
+
+> The clicks per second aren't exactly where they should be.
+
+This issue is not from a questionable setting.

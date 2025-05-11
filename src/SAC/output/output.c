@@ -4,7 +4,7 @@
 
 void handle_output_clicking(AppState *state) {
   if (!state->auto_click_ctrl.should_click) return;
-  if (state->auto_click_ctrl.cps_timer < (double)state->auto_click_ctrl.cps_timer_target) return;
+  if (state->auto_click_ctrl.cps_timer < state->auto_click_ctrl.cps_timer_target) return;
   int mouse_x = state->mouse_info.x;
   int mouse_y = state->mouse_info.y;
 

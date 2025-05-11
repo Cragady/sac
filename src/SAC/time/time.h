@@ -1,6 +1,9 @@
 #ifndef SAC_TIME_TIME_H_
 #define SAC_TIME_TIME_H_
 
+#include <stddef.h>
+
+#include "SDL3/SDL_init.h"
 #include "SDL3/SDL_stdinc.h"
 
 // Forward decl
@@ -21,5 +24,6 @@ int init_delta_time_s(delta_time_s*);
 int calc_delta_time(delta_time_s*);
 void handle_timers(AppState *state);
 void reset_input_timer(AppState *state, bool should_reset);
+SDL_AppResult poll_events_per_second(AppState *state, size_t events);
 
 #endif
